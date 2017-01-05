@@ -2,3 +2,9 @@
 elm-stuff/
 # elm-repl generated files
 repl-temp-*
+
+# Node JS files
+node_modules/
+
+# webpack distribution folder
+dist/
