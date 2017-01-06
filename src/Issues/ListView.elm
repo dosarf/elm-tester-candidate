@@ -18,7 +18,9 @@ nav : Html Msg
 nav =
   div [ class "clearfix mb2 white bg-black" ]
       [ div [ class "left p2"]
-            [ text "Issues" ]
+            [ text "Issues"
+            , createButton
+            ]
       ]
 
 list : List Issue -> Html Msg
@@ -57,3 +59,11 @@ editButton issue =
          [ i [ class "fa fa-pencil mr1" ]
              [ text "Edit" ]
          ]
+
+createButton : Html Msg
+createButton =
+ button [ class "btn btn-primary left p2"
+        , onClick CreateIssue ]
+        [ i [ class "mr1" ]
+            [ text "Create" ]
+        ]

@@ -1,16 +1,33 @@
 {
-  "issueMetadata" : {
-    "type": [ "improvement", "bug" ],
-    "priority": [ "critical", "high", "medium", "low" ]
+  "issueMetadata": {
+    "type": [
+      "improvement",
+      "bug"
+    ],
+    "priority": [
+      "critical",
+      "high",
+      "medium",
+      "low"
+    ]
   },
-
-  "issues" : [
-    { "id": "1",
+  "issues": [
+    {
+      "id": "1",
       "type": "bug",
       "priority": "medium",
       "summary": "Can't close app with alt-f4",
       "description": " * Start app\n\n * press alt-f4\n\n### Expected\n\nApp closes.\n\n### Actual\n\nNothing happens.",
-      "created": 12345.6,
+      "created": 12312345.6,
+      "hidden": false
+    },
+    {
+      "id": "2",
+      "type": "improvement",
+      "priority": "high",
+      "summary": "Set background to blue",
+      "description": "## Do\nPlease set the background to blue.\n * Blue is my favourite color.",
+      "created": 12322345.6,
       "hidden": false
     }
   ]

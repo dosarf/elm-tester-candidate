@@ -6,7 +6,7 @@ import Update exposing (update)
 import View exposing (view)
 import Routing exposing (parseLocation)
 
-import Issues.Commands exposing (fetchAllIssues)
+import Issues.Commands exposing (fetchAllIssues, fetchIssueMetadata, fetchIssueInitStuff)
 
 import Navigation exposing (Location)
 
@@ -17,7 +17,9 @@ init location =
   let currentRoute =
     Routing.parseLocation location
   in
-    ( initialModel currentRoute, Cmd.map IssuesMsg fetchAllIssues )
+    ( initialModel currentRoute
+    , List.map (Cmd.map IssuesMsg) fetchIssueInitStuff |> Cmd.batch
+    )
 
 -- SUBSCRIPTIONS
 

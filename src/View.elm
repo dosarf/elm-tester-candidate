@@ -30,13 +30,13 @@ page model =
 issueEditPage : Model -> IssueId -> Html Msg
 issueEditPage model issueId =
   let maybeIssue =
-    model.issuesModel.issues
+    model.issuesModel.editedIssue :: model.issuesModel.issues
       |> List.filter (\issue -> issue.id == issueId)
       |> List.head
   in
     case maybeIssue of
       Just issue ->
-        Html.map IssuesMsg (Issues.EditView.view model.issuesModel issue)
+        Html.map IssuesMsg (Issues.EditView.view model.issuesModel)
 
       Nothing ->
         notFoundView
