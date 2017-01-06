@@ -10,7 +10,7 @@
       "priority": "medium",
       "summary": "Can't close app with alt-f4",
       "description": " * Start app\n\n * press alt-f4\n\n### Expected\n\nApp closes.\n\n### Actual\n\nNothing happens.",
-      "created": "2017-01-05 23:26:00+02:00",
+      "created": 12345.6,
       "hidden": false
     }
   ]

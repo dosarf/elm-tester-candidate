@@ -1,17 +1,23 @@
 module Main exposing (..)
 
-import Models exposing (Model)
-import Messages exposing (Msg)
+import Models exposing (Model, initialModel)
+import Messages exposing (Msg(..))
 import Update exposing (update)
 import View exposing (view)
+import Routing exposing (parseLocation)
 
-import Html exposing (program)
+import Issues.Commands exposing (fetchAllIssues)
+
+import Navigation exposing (Location)
 
 -- MODEL INIT
 
-init : ( Model, Cmd Msg )
-init =
-  ( "'allo, 'allo, world", Cmd.none )
+init : Location -> ( Model, Cmd Msg )
+init location =
+  let currentRoute =
+    Routing.parseLocation location
+  in
+    ( initialModel currentRoute, Cmd.map IssuesMsg fetchAllIssues )
 
 -- SUBSCRIPTIONS
 
@@ -22,7 +28,7 @@ subscriptions model =
 -- MAIN
 main : Program Never Model Msg
 main =
-  program
+  Navigation.program OnLocationChange
     { init = init
     , view = view
     , update = update
