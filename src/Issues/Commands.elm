@@ -110,3 +110,22 @@ memberEncoded issue =
   in
     list
       |> Encode.object
+
+
+deleteIssue : IssueId -> Cmd Msg
+deleteIssue issueId =
+  deleteRequest issueId
+    |> Http.send OnDeleteIssue
+
+
+deleteRequest : IssueId -> Http.Request String
+deleteRequest issueId =
+  Http.request
+    { body = Http.emptyBody
+    , expect = Http.expectString
+    , headers = []
+    , method = "DELETE"
+    , timeout = Nothing
+    , url = (issueUrl issueId)
+    , withCredentials = False
+    }

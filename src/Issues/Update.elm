@@ -2,7 +2,8 @@ module Issues.Update exposing (..)
 
 import Issues.Messages exposing (Msg(..))
 import Issues.Models exposing (Model, Issue, IssueId, IssueMetadata, emptyIssue, createIssue)
-import Issues.Commands exposing (saveIssue)
+import Issues.Commands exposing (saveIssue, deleteIssue)
+import Issues.Ports exposing (confirmIssueDeletion)
 
 import Navigation
 
@@ -31,6 +32,20 @@ update message model =
     OnFetchIssueMetadata (Err httpError) ->
       ( model, Cmd.none )
 
+     -- FIXME implement properly
+    OnDeleteIssue (Ok responseString) ->
+      ( removeDesignatedIssueFromModel model, Cmd.none )
+
+    -- TODO show error to user in this case!
+    OnDeleteIssue (Err httpError) ->
+      ( { model | issueIdToRemove = Nothing }, Cmd.none )
+
+    OnIssueDeletionConfirmation (True, issueId) ->
+      ( { model | issueIdToRemove = Just issueId }, deleteIssue issueId)
+
+    OnIssueDeletionConfirmation (False, issueId) ->
+      ( model, Cmd.none)
+
     CreateIssue ->
       let
         newIssue =
@@ -39,6 +54,9 @@ update message model =
         ( { model | editedIssue = newIssue, hasChanged = True }
         , Navigation.newUrl ("#issues/" ++ newIssue.id)
         )
+
+    ConfirmDeleteIssue issueId ->
+      ( model, confirmIssueDeletion issueId )
 
     ShowIssue issueId ->
       ( { model | editedIssue = editedIssue model issueId, hasChanged = False }
@@ -126,3 +144,15 @@ updateModelIssues model issue =
         updatedExistingIssues
   in
     { model | issues = updatedIssues, hasChanged = False }
+
+
+removeDesignatedIssueFromModel : Model -> Model
+removeDesignatedIssueFromModel model =
+  case model.issueIdToRemove of
+    Just issueIdToRemove ->
+      { model
+        | issues = List.filter (\issue -> issue.id /= issueIdToRemove) model.issues
+        , issueIdToRemove = Nothing
+      }
+    Nothing ->
+      model

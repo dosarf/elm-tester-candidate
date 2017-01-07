@@ -55,7 +55,10 @@ issueRow issue =
        , issueTd issue.type_ showIssueMsg
        , issueTd issue.priority showIssueMsg
        , issueTd issue.summary showIssueMsg
-       , td [] [ editButton issue ]
+       , td []
+            [ editButton issue
+            , deleteButton issue
+            ]
        ]
 
 
@@ -71,6 +74,11 @@ issueTd tdText onClickMessage =
 editButton : Issue -> Html Msg
 editButton issue =
   issueEditorButton "pencil" (ShowIssue issue.id)
+
+
+deleteButton : Issue -> Html Msg
+deleteButton issue =
+  issueEditorButton "trash" (ConfirmDeleteIssue issue.id)
 
 
 createButton : Html Msg

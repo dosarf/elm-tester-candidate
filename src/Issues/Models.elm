@@ -29,6 +29,7 @@ type alias Model =
   , issues : List Issue
   , editedIssue : Issue
   , hasChanged : Bool
+  , issueIdToRemove : Maybe IssueId
   }
 
 
@@ -38,6 +39,7 @@ initialModel =
   , issues = []
   , editedIssue = emptyIssue
   , hasChanged = False
+  , issueIdToRemove = Nothing
   }
 
 

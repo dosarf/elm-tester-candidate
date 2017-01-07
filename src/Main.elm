@@ -8,6 +8,8 @@ import Routing exposing (parseLocation)
 
 import Issues.Commands exposing (fetchAllIssues, fetchIssueMetadata, fetchIssueInitStuff)
 
+import Issues.Ports
+
 import Navigation exposing (Location)
 
 -- MODEL INIT
@@ -21,11 +23,13 @@ init location =
     , List.map (Cmd.map IssuesMsg) fetchIssueInitStuff |> Cmd.batch
     )
 
+
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  Sub.map IssuesMsg Issues.Ports.subscriptions
+
 
 -- MAIN
 main : Program Never Model Msg

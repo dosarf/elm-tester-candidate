@@ -13,3 +13,11 @@ var mountNode = document.getElementById('main');
 // This would be an object describing the data we need
 // to start the program with, i.e. a user ID or some token
 var app = Elm.Main.embed(mountNode);
+
+app.ports.confirmIssueDeletion.subscribe(function(issueId){
+  if (confirm('You are about to delete issue #' + issueId)) {
+    app.ports.issueDeletionConfirmation.send([ true, issueId ]);
+  } else {
+    app.ports.issueDeletionConfirmation.send([ false, issueId ]);
+  }
+});
