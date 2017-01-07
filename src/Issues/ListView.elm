@@ -1,11 +1,14 @@
 module Issues.ListView exposing (..)
 
 import Html exposing (Html, div, text, table, tbody, thead, th, td, tr, i, button)
-import Html.Attributes exposing (class)
-import Html.Events exposing (onClick, onDoubleClick)
+import Html.Attributes exposing (class, style)
+import Html.Events exposing (onClick)
 
 import Issues.Messages exposing (Msg(..))
 import Issues.Models exposing (Issue, Model)
+
+import Issues.CommonGui exposing (navBar, navButton, issueEditorButton)
+
 
 view : Model -> Html Msg
 view model =
@@ -14,25 +17,24 @@ view model =
       , list model.issues
       ]
 
+
 nav : Html Msg
 nav =
-  div [ class "clearfix mb2 white bg-black" ]
-      [ div [ class "left p2"]
-            [ text "Issues"
-            , createButton
-            ]
-      ]
+  navBar
+    [ createButton
+    ]
+
 
 list : List Issue -> Html Msg
 list issues =
-  div []
-      [ table []
-              [ thead []
+  div [ class "overflow-scroll" ]
+      [ table [ class "table table-light overflow-hidden bg-white" ]
+              [ thead [ class "bg-darken-2 left-align" ]
                       [ tr []
-                           [ th [] [ text "Id" ]
-                           , th [] [ text "Type" ]
-                           , th [] [ text "Priority" ]
-                           , th [] [ text "Summary" ]
+                           [ th [ class issueTableCellClass ] [ text "Id" ]
+                           , th [ class issueTableCellClass ] [ text "Type" ]
+                           , th [ class issueTableCellClass ] [ text "Priority" ]
+                           , th [ class issueTableCellClass ] [ text "Summary" ]
                            , th [] []
                            ]
                       ]
@@ -41,29 +43,41 @@ list issues =
               ]
       ]
 
+
 issueRow : Issue -> Html Msg
 issueRow issue =
-  tr [ onDoubleClick (ShowIssue issue.id) ]
-     [ td [] [ text issue.id ]
-     , td [] [ text issue.type_ ]
-     , td [] [ text issue.priority ]
-     , td [] [ text issue.summary ]
-     , td []
-          [ editButton issue ]
+  let
+    showIssueMsg =
+      ShowIssue issue.id
+  in
+    tr []
+       [ issueTd issue.id showIssueMsg
+       , issueTd issue.type_ showIssueMsg
+       , issueTd issue.priority showIssueMsg
+       , issueTd issue.summary showIssueMsg
+       , td [] [ editButton issue ]
+       ]
+
+
+issueTd : String -> Msg -> Html Msg
+issueTd tdText onClickMessage =
+  td [ class issueTableCellClass
+     , style [ ("cursor", "pointer") ]
+     , onClick onClickMessage
      ]
+     [ text tdText ]
+
 
 editButton : Issue -> Html Msg
 editButton issue =
-  button [ class "btn regular"
-         , onClick (ShowIssue issue.id) ]
-         [ i [ class "fa fa-pencil mr1" ]
-             [ text "Edit" ]
-         ]
+  issueEditorButton "pencil" (ShowIssue issue.id)
+
 
 createButton : Html Msg
 createButton =
- button [ class "btn btn-primary left p2"
-        , onClick CreateIssue ]
-        [ i [ class "mr1" ]
-            [ text "Create" ]
-        ]
+  navButton "Create" "plus-circle" CreateIssue
+
+
+issueTableCellClass : String
+issueTableCellClass =
+  "table-cell pl1 pr1"
