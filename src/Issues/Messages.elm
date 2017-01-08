@@ -19,3 +19,5 @@ type Msg =
   | TypeChanged String
   | PriorityChanged String
   | DescriptionChanged String
+  | EditDescription
+  | ViewDescription

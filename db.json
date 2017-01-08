@@ -10,7 +10,7 @@
       "medium",
       "low"
     ],
-    "isDiscardDelete": true
+    "isDiscardDelete": false
   },
   "issues": [
     {
@@ -19,7 +19,6 @@
       "priority": "medium",
       "summary": "Example bug report",
       "description": "## Describe the bug\nDescribe the bug\n * using [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) notation.",
-      "created": 12312345.6,
       "hidden": false
     }
   ]

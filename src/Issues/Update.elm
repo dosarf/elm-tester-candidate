@@ -59,7 +59,11 @@ update message model =
       ( model, confirmIssueDiscard issueId )
 
     ShowIssue issueId ->
-      ( { model | editedIssue = editedIssue model issueId, hasChanged = False }
+      ( { model
+          | editedIssue = editedIssue model issueId
+          , hasChanged = False
+          , editingDescription = False
+        }
       , Navigation.newUrl ("#issues/" ++ issueId)
       )
 
@@ -111,6 +115,13 @@ update message model =
         updatedIssue = { issue | description = newDescription }
       in
         ( { model | editedIssue = updatedIssue, hasChanged = True }, Cmd.none )
+
+    EditDescription ->
+      ( { model | editingDescription = True }, Cmd.none )
+
+    ViewDescription ->
+      ( { model | editingDescription = False }, Cmd.none )
+
 
 
 editedIssue : Model -> IssueId -> Issue

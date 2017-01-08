@@ -8,13 +8,13 @@ import Markdown
 import Issues.Messages exposing (Msg(..))
 import Issues.Models exposing (Issue, Model, IssueMetadata)
 
-import Issues.CommonGui exposing (navBar, navButton)
+import Issues.CommonGui exposing (navBar, navButton, issueEditorButton)
 
 view : Model -> Html Msg
 view model =
   div []
       [ nav model.hasChanged
-      , form model.editedIssue model.issueMetadata
+      , form model
       ]
 
 
@@ -31,26 +31,36 @@ nav hasIssueChanged =
       (List.append [ cancelButton hasIssueChanged ] buttonsForChangedIssue)
 
 
-form : Issue -> IssueMetadata -> Html Msg
-form editedIssue issueMetadata =
-  div [ class "m3 max-width-3" ]
-      [ div [ class "col col-2" ] [ text "Summary" ]
-      , input [ class "h4 col col-10 mb3 bold"
-              , value editedIssue.summary
-              , onInput SummaryChanged
-              ]
-              []
-      , (fieldSelect issueMetadata.type_ editedIssue.type_ TypeChanged |> fieldRow "Type")
-      , (fieldSelect issueMetadata.priority editedIssue.priority PriorityChanged |> fieldRow "Priority")
-      , div [ class "col col-12" ]
-            [ text "Description" ]
-      , textarea [ class "col col-12"
-                 , rows 10
-                 , onInput DescriptionChanged
-                 ]
-                 [ text editedIssue.description ]
-      , Markdown.toHtml [ class "col col-10" ] editedIssue.description
-      ]
+form : Model -> Html Msg
+form model =
+  let
+    editedIssue =
+      model.editedIssue
+    issueMetadata =
+      model.issueMetadata
+  in
+    div [ class "m3 max-width-3" ]
+        [ div [ class "col col-2" ] [ text "Summary" ]
+        , input [ class "h4 col col-10 mb3 bold"
+                , value editedIssue.summary
+                , onInput SummaryChanged
+                ]
+                []
+        , (fieldSelect issueMetadata.type_ editedIssue.type_ TypeChanged |> fieldRow "Type")
+        , (fieldSelect issueMetadata.priority editedIssue.priority PriorityChanged |> fieldRow "Priority")
+        , div [ class "col col-12" ]
+              [ span [] [ text "Description" ]
+              , descriptionEditOrViewButton model ]
+        , descriptionEditorOrViewer model
+        {-
+        , textarea [ class "col col-12"
+                   , rows 10
+                   , onInput DescriptionChanged
+                   ]
+                   [ text editedIssue.description ]
+        , Markdown.toHtml [ class "col col-10" ] editedIssue.description
+        -}
+        ]
 
 
 fieldSelect : List String -> String -> (String -> Msg) -> Html Msg
@@ -90,3 +100,32 @@ cancelButton hasIssueChanged =
 applyButton : Bool -> Html Msg
 applyButton hasIssueChanged =
   navButton "Apply" "save" ApplyIssueChanges
+
+
+descriptionEditOrViewButton : Model -> Html Msg
+descriptionEditOrViewButton model =
+  let
+    faIcon =
+      if model.editingDescription then "eye" else "edit"
+    onClickMessage =
+      if model.editingDescription then ViewDescription else EditDescription
+  in
+    issueEditorButton faIcon onClickMessage
+
+
+descriptionEditorOrViewer : Model -> Html Msg
+descriptionEditorOrViewer model =
+  case model.editingDescription of
+    True ->
+      textarea [ class "col col-12"
+               , rows 10
+               , onInput DescriptionChanged
+               ]
+               [ text model.editedIssue.description ]
+
+    False ->
+      Markdown.toHtml
+        [ class "col col-12 border"
+        , onClick EditDescription
+        ]
+        model.editedIssue.description

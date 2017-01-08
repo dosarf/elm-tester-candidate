@@ -1,8 +1,5 @@
 module Issues.Models exposing (..)
 
-import Time exposing (Time)
-
-
 type alias IssueId =
   String
 
@@ -13,7 +10,6 @@ type alias Issue =
   , priority : String
   , summary : String
   , description : String
-  , created : Time
   , hidden : Bool
   }
 
@@ -32,6 +28,7 @@ type alias Model =
   , issues : List Issue
   , editedIssue : Issue
   , hasChanged : Bool
+  , editingDescription : Bool
   , issueIdToRemove : Maybe IssueId
   }
 
@@ -42,13 +39,14 @@ initialModel =
   , issues = []
   , editedIssue = emptyIssue
   , hasChanged = False
+  , editingDescription = False
   , issueIdToRemove = Nothing
   }
 
 
 emptyIssue : Issue
 emptyIssue =
-  Issue "" "" "" "" "" 0.0 False
+  Issue "" "" "" "" "" False
 
 
 createIssue : Model -> Issue
@@ -68,10 +66,7 @@ createIssue model =
     priority =
       List.head model.issueMetadata.priority
         |> Maybe.withDefault ""
-    description = """
-Description
- * first
- * second
-"""
+    description = """## Your description
+ * using [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) notation."""
   in
-    Issue nextIssueId type_ priority "Summary" description 1234.45 False
+    Issue nextIssueId type_ priority "Your summary" description False

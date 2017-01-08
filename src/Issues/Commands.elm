@@ -8,10 +8,9 @@ import Issues.Models exposing (IssueId, Issue, IssueMetadata, Model)
 import Issues.Messages exposing (..)
 
 
--- FIXME - hardwired URL
 baseUrl : String
 baseUrl =
-  "http://localhost:4000/"
+  "/"
 
 
 issueMetadataUrl : String
@@ -58,13 +57,12 @@ issueCollectionDecoder =
 
 memberDecoder : Decode.Decoder Issue
 memberDecoder =
-  Decode.map7 Issue
+  Decode.map6 Issue
     (Decode.field "id" Decode.string)
     (Decode.field "type" Decode.string)
     (Decode.field "priority" Decode.string)
     (Decode.field "summary" Decode.string)
     (Decode.field "description" Decode.string)
-    (Decode.field "created" Decode.float)
     (Decode.field "hidden" Decode.bool)
 
 
@@ -106,7 +104,6 @@ memberEncoded issue =
     , ( "priority", Encode.string issue.priority )
     , ( "summary", Encode.string issue.summary )
     , ( "description", Encode.string issue.description )
-    , ( "created", Encode.float issue.created )
     , ( "hidden", Encode.bool issue.hidden )
     ]
   in
