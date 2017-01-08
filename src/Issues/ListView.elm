@@ -27,21 +27,25 @@ nav =
 
 list : List Issue -> Html Msg
 list issues =
-  div [ class "overflow-scroll" ]
-      [ table [ class "table table-light overflow-hidden bg-white" ]
-              [ thead [ class "bg-darken-2 left-align" ]
-                      [ tr []
-                           [ th [ class issueTableCellClass ] [ text "Id" ]
-                           , th [ class issueTableCellClass ] [ text "Type" ]
-                           , th [ class issueTableCellClass ] [ text "Priority" ]
-                           , th [ class issueTableCellClass ] [ text "Summary" ]
-                           , th [] []
-                           ]
-                      ]
-              , tbody []
-                      (List.map issueRow issues)
-              ]
-      ]
+  let
+    visibleIssues =
+      issues |> List.filter (\issue -> not issue.hidden)
+  in
+    div [ class "overflow-scroll" ]
+        [ table [ class "table table-light overflow-hidden bg-white" ]
+                [ thead [ class "bg-darken-2 left-align" ]
+                        [ tr []
+                             [ th [ class issueTableCellClass ] [ text "Id" ]
+                             , th [ class issueTableCellClass ] [ text "Type" ]
+                             , th [ class issueTableCellClass ] [ text "Priority" ]
+                             , th [ class issueTableCellClass ] [ text "Summary" ]
+                             , th [] []
+                             ]
+                        ]
+                , tbody []
+                        (List.map issueRow visibleIssues)
+                ]
+        ]
 
 
 issueRow : Issue -> Html Msg
@@ -57,7 +61,7 @@ issueRow issue =
        , issueTd issue.summary showIssueMsg
        , td []
             [ editButton issue
-            , deleteButton issue
+            , discardButton issue
             ]
        ]
 
@@ -76,9 +80,9 @@ editButton issue =
   issueEditorButton "pencil" (ShowIssue issue.id)
 
 
-deleteButton : Issue -> Html Msg
-deleteButton issue =
-  issueEditorButton "trash" (ConfirmDeleteIssue issue.id)
+discardButton : Issue -> Html Msg
+discardButton issue =
+  issueEditorButton "trash" (ConfirmDiscardIssue issue.id)
 
 
 createButton : Html Msg

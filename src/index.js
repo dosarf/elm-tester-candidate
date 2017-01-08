@@ -14,10 +14,10 @@ var mountNode = document.getElementById('main');
 // to start the program with, i.e. a user ID or some token
 var app = Elm.Main.embed(mountNode);
 
-app.ports.confirmIssueDeletion.subscribe(function(issueId){
-  if (confirm('You are about to delete issue #' + issueId)) {
-    app.ports.issueDeletionConfirmation.send([ true, issueId ]);
+app.ports.confirmIssueDiscard.subscribe(function(issueId){
+  if (confirm('You are about to discard issue #' + issueId)) {
+    app.ports.issueDiscardConfirmation.send([ true, issueId ]);
   } else {
-    app.ports.issueDeletionConfirmation.send([ false, issueId ]);
+    app.ports.issueDiscardConfirmation.send([ false, issueId ]);
   }
 });

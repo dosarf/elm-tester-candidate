@@ -1,16 +1,16 @@
 port module Issues.Ports exposing (..)
 
-import Issues.Messages exposing (Msg(OnIssueDeletionConfirmation))
+import Issues.Messages exposing (Msg(OnIssueDiscardConfirmation))
 
 -- PORTS
 -- based on https://guide.elm-lang.org/interop/javascript.html
 
-port confirmIssueDeletion : String -> Cmd msg
+port confirmIssueDiscard : String -> Cmd msg
 
-port issueDeletionConfirmation : ((Bool, String) -> msg) -> Sub msg
+port issueDiscardConfirmation : ((Bool, String) -> msg) -> Sub msg
 
 -- SUBSCRIPTIONS
 
 subscriptions : Sub Msg
 subscriptions =
-  issueDeletionConfirmation OnIssueDeletionConfirmation
+  issueDiscardConfirmation OnIssueDiscardConfirmation

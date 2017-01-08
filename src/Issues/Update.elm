@@ -2,8 +2,8 @@ module Issues.Update exposing (..)
 
 import Issues.Messages exposing (Msg(..))
 import Issues.Models exposing (Model, Issue, IssueId, IssueMetadata, emptyIssue, createIssue)
-import Issues.Commands exposing (saveIssue, deleteIssue)
-import Issues.Ports exposing (confirmIssueDeletion)
+import Issues.Commands exposing (saveIssue, discardIssue)
+import Issues.Ports exposing (confirmIssueDiscard)
 
 import Navigation
 
@@ -40,10 +40,10 @@ update message model =
     OnDeleteIssue (Err httpError) ->
       ( { model | issueIdToRemove = Nothing }, Cmd.none )
 
-    OnIssueDeletionConfirmation (True, issueId) ->
-      ( { model | issueIdToRemove = Just issueId }, deleteIssue issueId)
+    OnIssueDiscardConfirmation (True, issueId) ->
+      ( { model | issueIdToRemove = Just issueId }, discardIssue model issueId)
 
-    OnIssueDeletionConfirmation (False, issueId) ->
+    OnIssueDiscardConfirmation (False, issueId) ->
       ( model, Cmd.none)
 
     CreateIssue ->
@@ -55,8 +55,8 @@ update message model =
         , Navigation.newUrl ("#issues/" ++ newIssue.id)
         )
 
-    ConfirmDeleteIssue issueId ->
-      ( model, confirmIssueDeletion issueId )
+    ConfirmDiscardIssue issueId ->
+      ( model, confirmIssueDiscard issueId )
 
     ShowIssue issueId ->
       ( { model | editedIssue = editedIssue model issueId, hasChanged = False }

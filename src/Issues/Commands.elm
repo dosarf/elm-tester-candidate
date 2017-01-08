@@ -4,7 +4,7 @@ import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 
-import Issues.Models exposing (IssueId, Issue, IssueMetadata)
+import Issues.Models exposing (IssueId, Issue, IssueMetadata, Model)
 import Issues.Messages exposing (..)
 
 
@@ -42,11 +42,13 @@ fetchIssueInitStuff =
   , fetchIssueMetadata
   ]
 
+
 issueMetadataDecoder : Decode.Decoder IssueMetadata
 issueMetadataDecoder =
-   Decode.map2 IssueMetadata
+   Decode.map3 IssueMetadata
      (Decode.field "type" (Decode.list Decode.string))
      (Decode.field "priority" (Decode.list Decode.string))
+     (Decode.field "isDiscardDelete" Decode.bool)
 
 
 issueCollectionDecoder : Decode.Decoder (List Issue)
@@ -112,6 +114,15 @@ memberEncoded issue =
       |> Encode.object
 
 
+discardIssue : Model -> IssueId -> Cmd Msg
+discardIssue model issueId =
+  case model.issueMetadata.isDiscardDelete of
+    True ->
+      deleteIssue issueId
+    False ->
+      hideAndSaveIssue model issueId
+
+
 deleteIssue : IssueId -> Cmd Msg
 deleteIssue issueId =
   deleteRequest issueId
@@ -129,3 +140,20 @@ deleteRequest issueId =
     , url = (issueUrl issueId)
     , withCredentials = False
     }
+
+
+hideAndSaveIssue : Model -> IssueId -> Cmd Msg
+hideAndSaveIssue model issueId =
+  let
+    maybeIssue =
+      model.issues
+        |> List.filter (\issue -> issue.id == issueId)
+        |> List.head
+  in
+    case maybeIssue of
+      Just issue ->
+        saveRequest False { issue | hidden = True }
+          |> Http.send OnSaveIssue
+
+      Nothing ->
+        Cmd.none

@@ -8,10 +8,10 @@ type Msg =
     OnFetchAllIssues (Result Http.Error (List Issue))
   | OnFetchIssueMetadata (Result Http.Error IssueMetadata)
   | OnSaveIssue (Result Http.Error Issue)
-  | OnIssueDeletionConfirmation (Bool, String)
+  | OnIssueDiscardConfirmation (Bool, String)
   | OnDeleteIssue (Result Http.Error String)
   | CreateIssue
-  | ConfirmDeleteIssue IssueId
+  | ConfirmDiscardIssue IssueId
   | ShowIssue IssueId
   | ShowIssues
   | ApplyIssueChanges

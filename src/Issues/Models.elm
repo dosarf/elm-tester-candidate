@@ -21,6 +21,9 @@ type alias Issue =
 type alias IssueMetadata =
   { type_ : List String
   , priority : List String
+
+  -- whether discarded issues are merely hidden or deleted for real
+  , isDiscardDelete : Bool
   }
 
 
@@ -35,7 +38,7 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-  { issueMetadata = IssueMetadata [] []
+  { issueMetadata = IssueMetadata [] [] False
   , issues = []
   , editedIssue = emptyIssue
   , hasChanged = False
