@@ -12,7 +12,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
   case message of
     OnFetchAllIssues (Ok allIssues) ->
-      ( { model | issues = allIssues }, Cmd.none )
+      ( { model | issues = allIssues, authors = authorsFrom allIssues }, Cmd.none )
 
     OnFetchAllIssues (Err httpError) ->
       ( model, alertBackendError "Could not load issues from backend" )
@@ -64,6 +64,9 @@ update message model =
 
     ShowIssues ->
       ( model, Navigation.newUrl "#issues" )
+
+    AuthorSelected author ->
+      ( { model | authorFilter = (if author == "" then Nothing else Just author) }, Cmd.none )
 
     ApplyIssueChanges ->
       let
@@ -158,3 +161,8 @@ removeDesignatedIssueFromModel model =
       }
     Nothing ->
       model
+
+
+authorsFrom : List Issue -> List String
+authorsFrom allIssues =
+  allIssues |> List.map .author

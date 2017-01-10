@@ -51,9 +51,10 @@ issueMetadataDecoder =
 
 issueConfigDecoder : Decode.Decoder IssueConfig
 issueConfigDecoder =
-  Decode.map2 IssueConfig
+  Decode.map3 IssueConfig
     (Decode.field "issueMetadata" issueMetadataDecoder)
     (Decode.field "isDiscardDelete" Decode.bool)
+    (Decode.field "showAuthors" Decode.bool)
 
 
 issueCollectionDecoder : Decode.Decoder (List Issue)
@@ -63,13 +64,14 @@ issueCollectionDecoder =
 
 memberDecoder : Decode.Decoder Issue
 memberDecoder =
-  Decode.map6 Issue
+  Decode.map7 Issue
     (Decode.field "id" Decode.string)
     (Decode.field "type" Decode.string)
     (Decode.field "priority" Decode.string)
     (Decode.field "summary" Decode.string)
     (Decode.field "description" Decode.string)
     (Decode.field "hidden" Decode.bool)
+    (Decode.field "author" Decode.string)
 
 
 issueUrl : IssueId -> String
@@ -111,6 +113,7 @@ memberEncoded issue =
     , ( "summary", Encode.string issue.summary )
     , ( "description", Encode.string issue.description )
     , ( "hidden", Encode.bool issue.hidden )
+    , ( "author", Encode.string issue.author )
     ]
   in
     list

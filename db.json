@@ -12,9 +12,9 @@
         "low"
       ]
     },
-    "isDiscardDelete": false
+    "isDiscardDelete": false,
+    "showAuthors": false
   },
-
   "issues": [
     {
       "id": "1",
@@ -22,7 +22,8 @@
       "priority": "medium",
       "summary": "Example bug report",
       "description": "## Describe the bug\nDescribe the bug\n * using [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) notation.",
-      "hidden": false
+      "hidden": false,
+      "author": "Anonymous"
     }
   ]
 }

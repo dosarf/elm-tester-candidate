@@ -14,6 +14,7 @@ type Msg =
   | ConfirmDiscardIssue IssueId
   | ShowIssue IssueId
   | ShowIssues
+  | AuthorSelected String
   | ApplyIssueChanges
   | SummaryChanged String
   | TypeChanged String

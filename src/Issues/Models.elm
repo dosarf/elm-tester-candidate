@@ -11,6 +11,7 @@ type alias Issue =
   , summary : String
   , description : String
   , hidden : Bool
+  , author : String
   }
 
 
@@ -25,6 +26,8 @@ type alias IssueConfig =
 
   -- whether discarded issues are merely hidden or deleted for real
   , isDiscardDelete : Bool
+
+  , showAuthors : Bool
   }
 
 
@@ -35,6 +38,8 @@ type alias Model =
   , hasChanged : Bool
   , editingDescription : Bool
   , issueIdToRemove : Maybe IssueId
+  , authors : List String
+  , authorFilter : Maybe String
   }
 
 
@@ -46,6 +51,8 @@ initialModel =
   , hasChanged = False
   , editingDescription = False
   , issueIdToRemove = Nothing
+  , authors = []
+  , authorFilter = Nothing
   }
 
 
@@ -56,12 +63,12 @@ emptyIssueMetadata =
 
 emptyIssueConfig : IssueConfig
 emptyIssueConfig =
-  IssueConfig emptyIssueMetadata False
+  IssueConfig emptyIssueMetadata False False
 
 
 emptyIssue : Issue
 emptyIssue =
-  Issue "" "" "" "" "" False
+  Issue "" "" "" "" "" False ""
 
 
 createIssue : Model -> Issue
@@ -84,4 +91,4 @@ createIssue model =
     description = """## Your description
  * using [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) notation."""
   in
-    Issue nextIssueId type_ priority "Your summary" description False
+    Issue nextIssueId type_ priority "Your summary" description False "Anonymous"
