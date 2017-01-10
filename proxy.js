@@ -23,7 +23,7 @@ proxy.on('error', function (err, req, res) {
   res.end('Something went wrong. And we are reporting a custom error message.');
 });
 
-var jsonApiRequestRegexp = new RegExp("/issue(Metadata|s(/.+)?)$");
+var jsonApiRequestRegexp = new RegExp("/issue(Config|s(/.+)?)$");
 var elmTarget = "http://127.0.0.1:3000";
 var jsonServerTarget = "http://127.0.0.1:4000";
 

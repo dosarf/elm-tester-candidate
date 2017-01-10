@@ -23,10 +23,10 @@ update message model =
     OnSaveIssue (Err httpError) ->
       ( model, alertBackendError "Could not save issue to backend" )
 
-    OnFetchIssueMetadata (Ok issueMetadata) ->
-      ( { model | issueMetadata = issueMetadata }, Cmd.none )
+    OnFetchIssueConfig (Ok issueConfig) ->
+      ( { model | issueConfig = issueConfig }, Cmd.none )
 
-    OnFetchIssueMetadata (Err httpError) ->
+    OnFetchIssueConfig (Err httpError) ->
       ( model, alertBackendError "Could not load basic data from backend" )
 
     OnDeleteIssue (Ok responseString) ->

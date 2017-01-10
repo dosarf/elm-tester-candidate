@@ -17,6 +17,11 @@ type alias Issue =
 type alias IssueMetadata =
   { type_ : List String
   , priority : List String
+  }
+
+
+type alias IssueConfig =
+  { issueMetadata : IssueMetadata
 
   -- whether discarded issues are merely hidden or deleted for real
   , isDiscardDelete : Bool
@@ -24,7 +29,7 @@ type alias IssueMetadata =
 
 
 type alias Model =
-  { issueMetadata : IssueMetadata
+  { issueConfig : IssueConfig
   , issues : List Issue
   , editedIssue : Issue
   , hasChanged : Bool
@@ -35,13 +40,23 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-  { issueMetadata = IssueMetadata [] [] False
+  { issueConfig = emptyIssueConfig
   , issues = []
   , editedIssue = emptyIssue
   , hasChanged = False
   , editingDescription = False
   , issueIdToRemove = Nothing
   }
+
+
+emptyIssueMetadata : IssueMetadata
+emptyIssueMetadata =
+  IssueMetadata [] []
+
+
+emptyIssueConfig : IssueConfig
+emptyIssueConfig =
+  IssueConfig emptyIssueMetadata False
 
 
 emptyIssue : Issue
@@ -61,10 +76,10 @@ createIssue model =
         |> (+) 1
         |> toString
     type_ =
-      List.head model.issueMetadata.type_
+      List.head model.issueConfig.issueMetadata.type_
         |> Maybe.withDefault ""
     priority =
-      List.head model.issueMetadata.priority
+      List.head model.issueConfig.issueMetadata.priority
         |> Maybe.withDefault ""
     description = """## Your description
  * using [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) notation."""

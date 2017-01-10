@@ -2,11 +2,11 @@ module Issues.Messages exposing (..)
 
 import Http
 
-import Issues.Models exposing (Issue, IssueId, IssueMetadata)
+import Issues.Models exposing (Issue, IssueId, IssueConfig)
 
 type Msg =
     OnFetchAllIssues (Result Http.Error (List Issue))
-  | OnFetchIssueMetadata (Result Http.Error IssueMetadata)
+  | OnFetchIssueConfig (Result Http.Error IssueConfig)
   | OnSaveIssue (Result Http.Error Issue)
   | OnIssueDiscardConfirmation (Bool, String)
   | OnDeleteIssue (Result Http.Error String)

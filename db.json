@@ -1,17 +1,20 @@
 {
-  "issueMetadata": {
-    "type": [
-      "improvement",
-      "bug"
-    ],
-    "priority": [
-      "critical",
-      "high",
-      "medium",
-      "low"
-    ],
+  "issueConfig": {
+    "issueMetadata": {
+      "type": [
+        "improvement",
+        "bug"
+      ],
+      "priority": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ]
+    },
     "isDiscardDelete": false
   },
+
   "issues": [
     {
       "id": "1",

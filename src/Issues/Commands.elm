@@ -4,7 +4,7 @@ import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 
-import Issues.Models exposing (IssueId, Issue, IssueMetadata, Model)
+import Issues.Models exposing (IssueId, Issue, IssueConfig, IssueMetadata, Model)
 import Issues.Messages exposing (..)
 
 
@@ -13,15 +13,15 @@ baseUrl =
   "/"
 
 
-issueMetadataUrl : String
-issueMetadataUrl =
-  baseUrl ++ "issueMetadata"
+issueConfigUrl : String
+issueConfigUrl =
+  baseUrl ++ "issueConfig"
 
 
-fetchIssueMetadata : Cmd Msg
-fetchIssueMetadata =
-  Http.get issueMetadataUrl issueMetadataDecoder
-    |> Http.send OnFetchIssueMetadata
+fetchIssueConfig : Cmd Msg
+fetchIssueConfig =
+  Http.get issueConfigUrl issueConfigDecoder
+    |> Http.send OnFetchIssueConfig
 
 
 allIssuesUrl : String
@@ -38,16 +38,22 @@ fetchAllIssues =
 fetchIssueInitStuff : List (Cmd Msg)
 fetchIssueInitStuff =
   [ fetchAllIssues
-  , fetchIssueMetadata
+  , fetchIssueConfig
   ]
 
 
 issueMetadataDecoder : Decode.Decoder IssueMetadata
 issueMetadataDecoder =
-   Decode.map3 IssueMetadata
+   Decode.map2 IssueMetadata
      (Decode.field "type" (Decode.list Decode.string))
      (Decode.field "priority" (Decode.list Decode.string))
-     (Decode.field "isDiscardDelete" Decode.bool)
+
+
+issueConfigDecoder : Decode.Decoder IssueConfig
+issueConfigDecoder =
+  Decode.map2 IssueConfig
+    (Decode.field "issueMetadata" issueMetadataDecoder)
+    (Decode.field "isDiscardDelete" Decode.bool)
 
 
 issueCollectionDecoder : Decode.Decoder (List Issue)
@@ -113,7 +119,7 @@ memberEncoded issue =
 
 discardIssue : Model -> IssueId -> Cmd Msg
 discardIssue model issueId =
-  case model.issueMetadata.isDiscardDelete of
+  case model.issueConfig.isDiscardDelete of
     True ->
       deleteIssue issueId
     False ->

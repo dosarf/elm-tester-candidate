@@ -37,7 +37,7 @@ form model =
     editedIssue =
       model.editedIssue
     issueMetadata =
-      model.issueMetadata
+      model.issueConfig.issueMetadata
   in
     div [ class "m3 max-width-3" ]
         [ div [ class "col col-2" ] [ text "Summary" ]

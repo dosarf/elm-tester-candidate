@@ -6,7 +6,7 @@ import Update exposing (update)
 import View exposing (view)
 import Routing exposing (parseLocation)
 
-import Issues.Commands exposing (fetchAllIssues, fetchIssueMetadata, fetchIssueInitStuff)
+import Issues.Commands exposing (fetchIssueInitStuff)
 
 import Issues.Ports
 
