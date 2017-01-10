@@ -9,6 +9,8 @@ port confirmIssueDiscard : String -> Cmd msg
 
 port issueDiscardConfirmation : ((Bool, String) -> msg) -> Sub msg
 
+port alertBackendError : String -> Cmd msg
+
 -- SUBSCRIPTIONS
 
 subscriptions : Sub Msg

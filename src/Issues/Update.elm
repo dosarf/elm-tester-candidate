@@ -3,7 +3,7 @@ module Issues.Update exposing (..)
 import Issues.Messages exposing (Msg(..))
 import Issues.Models exposing (Model, Issue, IssueId, IssueMetadata, emptyIssue, createIssue)
 import Issues.Commands exposing (saveIssue, discardIssue)
-import Issues.Ports exposing (confirmIssueDiscard)
+import Issues.Ports exposing (confirmIssueDiscard, alertBackendError)
 
 import Navigation
 
@@ -14,30 +14,26 @@ update message model =
     OnFetchAllIssues (Ok allIssues) ->
       ( { model | issues = allIssues }, Cmd.none )
 
-    -- TODO show error to user in this case!
     OnFetchAllIssues (Err httpError) ->
-      ( model, Cmd.none )
+      ( model, alertBackendError "Could not load issues from backend" )
 
     OnSaveIssue (Ok issue) ->
       ( updateModelIssues model issue, Cmd.none )
 
-    -- TODO show error to user in this case!
     OnSaveIssue (Err httpError) ->
-      ( model, Cmd.none )
+      ( model, alertBackendError "Could not save issue to backend" )
 
     OnFetchIssueMetadata (Ok issueMetadata) ->
       ( { model | issueMetadata = issueMetadata }, Cmd.none )
 
-    -- TODO show error to user in this case!
     OnFetchIssueMetadata (Err httpError) ->
-      ( model, Cmd.none )
+      ( model, alertBackendError "Could not load basic data from backend" )
 
     OnDeleteIssue (Ok responseString) ->
       ( removeDesignatedIssueFromModel model, Cmd.none )
 
-    -- TODO show error to user in this case!
     OnDeleteIssue (Err httpError) ->
-      ( { model | issueIdToRemove = Nothing }, Cmd.none )
+      ( { model | issueIdToRemove = Nothing }, alertBackendError "Could not delete issue from backend" )
 
     OnIssueDiscardConfirmation (True, issueId) ->
       ( { model | issueIdToRemove = Just issueId }, discardIssue model issueId)
@@ -83,10 +79,6 @@ update message model =
           Nothing ->
             ( model, saveIssue True model.editedIssue )
 
-    {- TODO there is a lot of verbose, repetitive boilerplate in
-       (Summary, Type, Priority, Description)Changed message handling
-       Is this a sign that Issue editing should be a sub-sub-component?
-    -}
     SummaryChanged newSummary ->
       let
         issue = model.editedIssue

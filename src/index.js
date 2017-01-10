@@ -21,3 +21,7 @@ app.ports.confirmIssueDiscard.subscribe(function(issueId){
     app.ports.issueDiscardConfirmation.send([ false, issueId ]);
   }
 });
+
+app.ports.alertBackendError.subscribe(function(message){
+  alert(message);
+});
