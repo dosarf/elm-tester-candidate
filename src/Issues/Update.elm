@@ -32,7 +32,6 @@ update message model =
     OnFetchIssueMetadata (Err httpError) ->
       ( model, Cmd.none )
 
-     -- FIXME implement properly
     OnDeleteIssue (Ok responseString) ->
       ( removeDesignatedIssueFromModel model, Cmd.none )
 

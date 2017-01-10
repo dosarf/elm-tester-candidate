@@ -52,14 +52,6 @@ form model =
               [ span [] [ text "Description" ]
               , descriptionEditOrViewButton model ]
         , descriptionEditorOrViewer model
-        {-
-        , textarea [ class "col col-12"
-                   , rows 10
-                   , onInput DescriptionChanged
-                   ]
-                   [ text editedIssue.description ]
-        , Markdown.toHtml [ class "col col-10" ] editedIssue.description
-        -}
         ]
 
 
