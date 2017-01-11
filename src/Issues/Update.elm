@@ -7,6 +7,7 @@ import Issues.Ports exposing (confirmIssueDiscard, alertBackendError)
 
 import Navigation
 
+import Set exposing (Set)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
@@ -165,4 +166,24 @@ removeDesignatedIssueFromModel model =
 
 authorsFrom : List Issue -> List String
 authorsFrom allIssues =
-  allIssues |> List.map .author
+  allIssues |> List.map .author |> unique
+
+
+-- shamelessly copied from https://github.com/circuithub/elm-list-extra/blob/3.10.0/src/List/Extra.elm
+-- as it does not support Elm 0.18.0 yet
+unique : List comparable -> List comparable
+unique list =
+  uniqueHelp Set.empty list
+
+
+uniqueHelp : Set comparable -> List comparable -> List comparable
+uniqueHelp existing remaining =
+  case remaining of
+    [] ->
+      []
+
+    first :: rest ->
+      if Set.member first existing then
+        uniqueHelp existing rest
+      else
+        first :: uniqueHelp (Set.insert first existing) rest
