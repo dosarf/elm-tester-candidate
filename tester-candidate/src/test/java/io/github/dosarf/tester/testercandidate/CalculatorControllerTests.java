@@ -27,11 +27,11 @@ class CalculatorControllerTests {
 		CalculationRequest request = new CalculationRequest(CalculationRequest.Operator.ADD, "2", "3");
 		String requestStr = objectMapper.writeValueAsString(request);
 
-		CalculationResponse response = CalculationResponse.failure(request, "TODO");
+		CalculationResponse response = CalculationResponse.success(request, 0L);
 		String responseStr = objectMapper.writeValueAsString(response);
 
 		mvc.perform(MockMvcRequestBuilders.post("/calculator").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content(requestStr))
-				.andExpect(status().is5xxServerError())
+				.andExpect(status().isOk())
 				.andExpect(content().json(responseStr));
 	}
 }
