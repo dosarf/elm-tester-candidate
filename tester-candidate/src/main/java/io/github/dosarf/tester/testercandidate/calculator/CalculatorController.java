@@ -30,11 +30,8 @@ public class CalculatorController {
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(CalculationResponse.success(request, result));
-        } catch (Calculator.Exc e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(CalculationResponse.failure(request, e.getMessage()));
-        } catch (RuntimeException e) {
+        } catch (Calculator.Exc |RuntimeException e) {
+            // BUGGY ON PURPOSE: no distinction between bad request and internal error
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(CalculationResponse.failure(request, e.getMessage()));

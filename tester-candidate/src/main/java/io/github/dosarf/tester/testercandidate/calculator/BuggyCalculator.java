@@ -23,21 +23,29 @@ public class BuggyCalculator implements Calculator {
     }
 
     private String getExpression(CalculationRequest.Operator operator, String[] operands) throws Exc {
+        // BUGGY ON PURPOSE
+        // - operand count is not sanitized (binary operators need exactly one operand, etc)
+        // - operand type (can be converted to number?) is not checked either at this point
         switch (operator) {
             case ADD:
                 return String.format("%s + %s", operands[0], operands[1]);
             case SUBTRACT:
-                return String.format("%s - %s", operands[0], operands[1]);
+                // BUGGY ON PURPOSE: instead of a - b, calculates b - a
+                return String.format("%s - %s", operands[1], operands[0]);
             case MULTIPLY:
                 return String.format("%s * %s", operands[0], operands[1]);
             case DIVIDE:
-                return String.format("%s / %s", operands[0], operands[1]);
+                // BUGGY ON PURPOSE: instead of a/b, calculates b/a
+                return String.format("%s / %s", operands[1], operands[0]);
             case SQUARE:
                 return String.format("Math.pow(%s, 2)", operands[0]);
             case SQUARE_ROOT:
-                return String.format("Math.sqrt(%s)", operands[0]);
+                // BUGGY ON PURPOSE: (among other things) turns negative operand into positive ones
+                // before taking square root
+                return String.format("Math.sqrt(%s)", operands[0].replace("-", ""));
             case POWER:
-                return String.format("Math.pow(%s, %s)", operands[0], operands[1]);
+                // BUGGY ON PURPOSE: (among other things) turns negative exponent into positive one
+                return String.format("Math.pow(%s, %s)", operands[0], operands[1].replace("-", ""));
             default:
                 throw new Calculator.Exc(null, "unknown operator");
 
