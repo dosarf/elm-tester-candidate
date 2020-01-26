@@ -1,14 +1,29 @@
 package io.github.dosarf.tester.testercandidate.issuetracker;
 
+import io.github.dosarf.tester.testercandidate.user.User;
+import io.github.dosarf.tester.testercandidate.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
+
 @Controller
-@RequestMapping("/issuetracker")
+@RequestMapping("/issue")
 public class IssueTrackerController {
+
+    @Autowired
+    private IssueService issueService;
+    @Autowired
+    private UserService userService;
+
 
     @GetMapping("/spa")
     public RedirectView redirect(RedirectAttributes attributes) {
@@ -19,4 +34,68 @@ public class IssueTrackerController {
     public RedirectView redirect2(RedirectAttributes attributes) {
         return new RedirectView("index.html");
     }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Issue> issue(@PathVariable Long id) {
+
+        Optional<Issue> issueMaybe = issueService.findById(id);
+
+        return issueMaybe
+                .map(issue -> ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(issue))
+                .orElseGet(() -> ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .build());
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<Issue> create(@RequestBody Issue issue) {
+        User creatorFromRequest = issue.getCreator();
+        if (Objects.isNull(creatorFromRequest)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(issue);
+        }
+
+        Optional<User> creatorMaybe = userService.findById(creatorFromRequest.getId());
+        if (!creatorMaybe.isPresent()) {
+            return ResponseEntity
+                    .notFound()
+                    .build();
+        }
+
+        Issue copy = new Issue(
+                issue.getSummary(),
+                issue.getPriority(),
+                issue.getDescription(),
+                creatorMaybe.get());
+
+        Issue persisted = issueService.save(copy);
+
+        if (Objects.isNull(persisted)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(persisted.getId())
+                    .toUri();
+
+            return ResponseEntity
+                    .created(uri)
+                    .body(persisted);
+        }
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<Iterable<Issue>>  listAll() {
+        Iterable<Issue> issues = issueService.findAll();
+
+        return ResponseEntity
+                .ok(issues);
+    }
+
+
+
 }

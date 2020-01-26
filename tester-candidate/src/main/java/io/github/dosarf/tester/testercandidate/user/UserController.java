@@ -1,15 +1,14 @@
 package io.github.dosarf.tester.testercandidate.user;
 
+import io.github.dosarf.tester.testercandidate.issuetracker.Issue;
+import io.github.dosarf.tester.testercandidate.issuetracker.IssueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -20,6 +19,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private IssueService issueService;
+
 
     @GetMapping("/{id}")
     public ResponseEntity<User> user(@PathVariable Long id) {
@@ -55,10 +57,26 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Iterable<User>>  listAll() {
+    public ResponseEntity<Iterable<User>> listAll() {
         Iterable<User> users = userService.findAll();
 
         return ResponseEntity
                 .ok(users);
+    }
+
+
+    @GetMapping("/{id}/issue")
+    public ResponseEntity<Iterable<Issue>>  listIssuesCreatedBy(@PathVariable Long id) {
+        Optional<User> userMaybe = userService.findById(id);
+
+        return userMaybe
+                .map(creator -> issueService.findByCreator(creator))
+                .map(issues -> (Iterable<Issue>)issues)
+                .map(issues -> ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(issues))
+                .orElseGet(() -> ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .build());
     }
 }

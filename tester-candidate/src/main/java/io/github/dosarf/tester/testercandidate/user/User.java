@@ -1,26 +1,35 @@
 package io.github.dosarf.tester.testercandidate.user;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import io.github.dosarf.tester.testercandidate.issuetracker.Issue;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 // see https://spring.io/guides/gs/accessing-data-jpa/
 @Entity
 public class User {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.AUTO, generator = "USER_SEQ")
     private Long id;
 
     private String firstName;
     private String lastName;
+    @OneToMany
+    private List<Issue> createdIssues;
 
     protected User() {}
 
     public User(String firstName, String lastName) {
+        this(null, firstName, lastName);
+    }
+
+    public User(Long id, String firstName, String lastName) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+        createdIssues = new ArrayList<>();
     }
 
     public Long getId() {
@@ -33,6 +42,10 @@ public class User {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public List<Issue> getCreatedIssues() {
+        return createdIssues;
     }
 
     @Override
