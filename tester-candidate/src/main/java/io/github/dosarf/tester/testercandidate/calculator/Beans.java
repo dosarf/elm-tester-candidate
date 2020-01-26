@@ -1,4 +1,4 @@
-package io.github.dosarf.tester.testercandidate;
+package io.github.dosarf.tester.testercandidate.calculator;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

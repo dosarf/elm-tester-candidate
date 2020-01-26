@@ -1,10 +1,9 @@
-package io.github.dosarf.tester.testercandidate;
+package io.github.dosarf.tester.testercandidate.calculator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 @Component

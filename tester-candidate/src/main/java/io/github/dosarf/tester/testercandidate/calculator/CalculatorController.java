@@ -1,4 +1,4 @@
-package io.github.dosarf.tester.testercandidate;
+package io.github.dosarf.tester.testercandidate.calculator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

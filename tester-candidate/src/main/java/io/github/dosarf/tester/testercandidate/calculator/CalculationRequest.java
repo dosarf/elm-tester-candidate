@@ -1,4 +1,4 @@
-package io.github.dosarf.tester.testercandidate;
+package io.github.dosarf.tester.testercandidate.calculator;
 
 public class CalculationRequest {
     public static enum Operator {
