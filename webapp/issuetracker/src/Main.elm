@@ -14,46 +14,44 @@ import Mwc.TextField
 
 type alias Model =
     { currentTab : Int
-    , incDecModel : IncrementDecrementTab.Model
-    , findFirstUniqueModel : FindFirstUniqueTab.Model
     , issueTrackerModel : IssueTracker.Model
     }
 
 
-initialModel : Model
-initialModel =
-    { currentTab = 0
-    , incDecModel = IncrementDecrementTab.initialModel
-    , findFirstUniqueModel = FindFirstUniqueTab.initialModel
-    , issueTrackerModel = IssueTracker.initialModel
-    }
+init : () -> ( Model, Cmd Msg)
+init () =
+    let
+        ( issueTrackerModel, issueTrackerCmd ) =
+            IssueTracker.init ()
+    in
+        ( { currentTab = 0
+          , issueTrackerModel = issueTrackerModel
+          }
+        , Cmd.map IssueTrackerMsg issueTrackerCmd
+        )
 
 
 type Msg
     = SelectTab Int
-    | IncDecMsg IncrementDecrementTab.Msg
-    | FindFirstUniqueMsg FindFirstUniqueTab.Msg
     | IssueTrackerMsg IssueTracker.Msg
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectTab newTab ->
-            { model | currentTab = newTab }
-
-        IncDecMsg incDecMsg ->
-            { model | incDecModel = IncrementDecrementTab.update incDecMsg model.incDecModel }
-
-        FindFirstUniqueMsg findFirstUniqueMsg ->
-            { model | findFirstUniqueModel = FindFirstUniqueTab.update findFirstUniqueMsg model.findFirstUniqueModel }
+            ( { model | currentTab = newTab }
+            , Cmd.none
+            )
 
         IssueTrackerMsg issueTrackerMsg ->
             let
                 ( issueTrackerModel, cmd ) =
                     IssueTracker.update issueTrackerMsg model.issueTrackerModel
             in
-                { model | issueTrackerModel = issueTrackerModel }
+                ( { model | issueTrackerModel = issueTrackerModel }
+                , Cmd.map IssueTrackerMsg cmd
+                )
 
 
 {-| A plain old record holding a couple of theme colors.
@@ -101,9 +99,7 @@ view model =
                 [ Mwc.Tabs.selected model.currentTab
                 , Mwc.Tabs.onClick SelectTab
                 , Mwc.Tabs.tabText
-                    [ text "Inc/Dec"
-                    , text "Find 1st unique"
-                    , text "IssueTracker"
+                    [ text "IssueTracker"
                     ]
                 ]
             , tabContentView model
@@ -114,19 +110,18 @@ view model =
 tabContentView : Model -> Html Msg
 tabContentView model =
     case model.currentTab of
-        0 ->
-            map IncDecMsg (IncrementDecrementTab.view model.incDecModel)
-
-        1 ->
-            map FindFirstUniqueMsg (FindFirstUniqueTab.view model.findFirstUniqueModel)
-
         _ ->
             map IssueTrackerMsg (IssueTracker.view model.issueTrackerModel)
 
 
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
 main =
-    Browser.sandbox
-        { init = initialModel
+    Browser.element
+        { init = init
         , view = view >> toUnstyled
         , update = update
+        , subscriptions = subscriptions
         }

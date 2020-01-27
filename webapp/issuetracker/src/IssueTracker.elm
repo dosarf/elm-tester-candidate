@@ -1,4 +1,4 @@
-module IssueTracker exposing (Model, Msg, initialModel, update, view)
+module IssueTracker exposing (Model, Msg, init, update, view)
 
 import User exposing (User, displayName, userDecoder, userEncoder)
 
@@ -18,10 +18,12 @@ type Msg =
     Nop
 
 
-initialModel : Model
-initialModel =
-    { user = Nothing
-    }
+init : () -> ( Model, Cmd Msg )
+init () =
+    ( { user = Nothing
+      }
+    , Cmd.none
+    )
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
