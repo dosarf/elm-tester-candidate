@@ -1,13 +1,15 @@
-module User exposing (User, displayName, userDecoder, userEncoder)
+module User exposing (User, displayName, userDecoder, usersDecoder, userEncoder)
 
 import Json.Decode as Decode
 import Json.Encode as Encode
+
 
 type alias User =
   { id : Int
   , firstName : String
   , lastName : String
   }
+
 
 displayName : User -> String
 displayName user =
@@ -21,6 +23,7 @@ userDecoder =
         (Decode.field "firstName" Decode.string)
         (Decode.field "lastName" Decode.string)
 
+
 userEncoder : User -> Encode.Value
 userEncoder user =
     Encode.object
@@ -28,3 +31,8 @@ userEncoder user =
         , ( "firstName", Encode.string user.firstName )
         , ( "lastName", Encode.string user.lastName )
         ]
+
+
+usersDecoder : Decode.Decoder (List User)
+usersDecoder =
+    Decode.list userDecoder

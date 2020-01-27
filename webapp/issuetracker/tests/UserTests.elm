@@ -2,7 +2,7 @@ module UserTests exposing (testSuite)
 
 import Dict exposing (Dict)
 import Expect
-import User exposing (User, userDecoder, userEncoder)
+import User exposing (User, userDecoder, usersDecoder, userEncoder)
 import Test exposing (..)
 
 import Json.Decode as Decode
@@ -30,4 +30,13 @@ testSuite =
                     encodedUser = Encode.encode 0 (userEncoder user)
                 in
                     Expect.equal encodedUser userJson
+        , test "usersDecoder works correctly" <|
+            \() ->
+                let
+                    input =
+                        "[" ++ userJson ++ "]"
+                    decodedUsers =
+                        Decode.decodeString usersDecoder input
+                in
+                    Expect.equal decodedUsers (Ok [user])
         ]
