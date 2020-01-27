@@ -99,7 +99,7 @@ view model =
                 [ Mwc.Tabs.selected model.currentTab
                 , Mwc.Tabs.onClick SelectTab
                 , Mwc.Tabs.tabText
-                    [ text "IssueTracker"
+                    [ text <| IssueTracker.tabText model.issueTrackerModel
                     ]
                 ]
             , tabContentView model

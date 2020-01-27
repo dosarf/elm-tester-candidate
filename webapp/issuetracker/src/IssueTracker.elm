@@ -1,9 +1,9 @@
-module IssueTracker exposing (Model, Msg, init, update, view)
+module IssueTracker exposing (Model, Msg, init, tabText, update, view)
 
 import User exposing (User, usersDecoder)
 
 import Css exposing (px, width)
-import Html.Styled exposing (Html, div, label, text)
+import Html.Styled exposing (Html, div, label, li, text, ul)
 import Html.Styled.Attributes exposing (css)
 import Mwc.Button
 import Mwc.TextField
@@ -12,9 +12,9 @@ import Http
 import Issue exposing (Issue, issuesDecoder)
 
 
-issuesUri : String
-issuesUri =
-    "../"
+userIssuesUri : User -> String
+userIssuesUri user =
+    "../../user/" ++ (String.fromInt user.id) ++ "/issue"
 
 usersUri : String
 usersUri =
@@ -22,8 +22,15 @@ usersUri =
 
 type alias Model =
     { user : Maybe User
+    , issues : List Issue
     }
 
+tabText : Model -> String
+tabText model =
+    model.user
+        |> Maybe.map User.displayName
+        |> Maybe.map (\displayName -> "Issues (" ++ displayName ++ ")")
+        |> Maybe.withDefault "(no user)"
 
 type Msg
     = IssuesDownloaded (Result Http.Error (List Issue))
@@ -44,12 +51,12 @@ downloadUsers =
         }
 
 
-downloadIssues : Cmd Msg
-downloadIssues =
+downloadIssuesOf : User -> Cmd Msg
+downloadIssuesOf user =
     Http.request
         { method = "GET"
         , headers = [ Http.header "Accept" "application/json" ]
-        , url = issuesUri
+        , url = userIssuesUri user
         , body = Http.emptyBody
         , expect = Http.expectJson IssuesDownloaded issuesDecoder
         , timeout = Just <| 10.0 * 1000.0
@@ -60,6 +67,7 @@ downloadIssues =
 init : () -> ( Model, Cmd Msg )
 init () =
     ( { user = Nothing
+      , issues = []
       }
     , downloadUsers
     )
@@ -99,7 +107,7 @@ update msg model =
                         _ =
                             Debug.log "Issues downloaded" issues
                     in
-                        ( model
+                        ( { model | issues = issues }
                         , Cmd.none
                         )
 
@@ -118,9 +126,13 @@ update msg model =
                     let
                         _ =
                             Debug.log "Users downloaded" users
+                        firstUserMaybe =
+                            List.head users
                     in
-                        ( { model | user = List.head users }
-                        , Cmd.none
+                        ( { model | user = firstUserMaybe }
+                        , firstUserMaybe
+                            |> Maybe.map downloadIssuesOf
+                            |> Maybe.withDefault Cmd.none
                         )
 
 
@@ -130,9 +142,23 @@ update msg model =
             )
 
 
+issuesListItems: Model -> List(Html Msg)
+issuesListItems model =
+    model.issues
+        |> List.map (\issue -> li [] [ text <| (String.fromInt issue.id) ++ ": " ++ issue.summary ])
+
+issuesView : Model -> Html Msg
+issuesView model =
+    div
+        []
+        [ label [] [ text "Issues: " ]
+        ,  ul
+              []
+              (issuesListItems model)
+        ]
+
 view : Model -> Html Msg
 view model =
     div
         []
-        [ label [] [ text (model.user |> Maybe.map User.displayName |> Maybe.withDefault "no user defined" ) ]
-        ]
+        [ issuesView model ]

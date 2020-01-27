@@ -10,7 +10,8 @@
     "build": "webpack --mode production",
     "watch": "webpack --mode development --watch",
     "dev": "webpack-dev-server --mode development --port 3000",
-    "errors": "webpack --mode development --display-error-details"
+    "errors": "webpack --mode development --display-error-details",
+    "deploy": "cp -r dist/* ../../tester-candidate/src/main/resources/static/issue/spa/"
   },
   "dependencies": {
     "elm-webpack-loader": "^5.0.0",
