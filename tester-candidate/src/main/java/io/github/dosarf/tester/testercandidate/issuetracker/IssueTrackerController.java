@@ -66,25 +66,27 @@ public class IssueTrackerController {
                     .build();
         }
 
+        User creator = creatorMaybe.get();
+
         Issue copy = new Issue(
                 issue.getSummary(),
                 issue.getPriority(),
                 issue.getDescription(),
-                creatorMaybe.get());
+                creator);
 
-        Issue persisted = issueService.save(copy);
+        Issue persistedIssue = issueService.save(copy);
 
-        if (Objects.isNull(persisted)) {
+        if (Objects.isNull(persistedIssue)) {
             return ResponseEntity.notFound().build();
         } else {
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{id}")
-                    .buildAndExpand(persisted.getId())
+                    .buildAndExpand(persistedIssue.getId())
                     .toUri();
 
             return ResponseEntity
                     .created(uri)
-                    .body(persisted);
+                    .body(persistedIssue);
         }
     }
 

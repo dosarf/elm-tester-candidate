@@ -1,10 +1,9 @@
 package io.github.dosarf.tester.testercandidate.user;
 
-import io.github.dosarf.tester.testercandidate.issuetracker.Issue;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Objects;
 
 // see https://spring.io/guides/gs/accessing-data-jpa/
@@ -16,8 +15,6 @@ public class User {
 
     private String firstName;
     private String lastName;
-    @OneToMany
-    private List<Issue> createdIssues;
 
     protected User() {}
 
@@ -29,7 +26,6 @@ public class User {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        createdIssues = new ArrayList<>();
     }
 
     public Long getId() {
@@ -42,10 +38,6 @@ public class User {
 
     public String getLastName() {
         return lastName;
-    }
-
-    public List<Issue> getCreatedIssues() {
-        return createdIssues;
     }
 
     @Override
