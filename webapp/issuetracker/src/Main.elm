@@ -6,6 +6,7 @@ import FindFirstUniqueTab
 import Html.Styled exposing (Html, div, header, img, main_, map, text, toUnstyled)
 import Html.Styled.Attributes exposing (css, src)
 import IncrementDecrementTab
+import IssueTracker
 import Mwc.Button
 import Mwc.Tabs
 import Mwc.TextField
@@ -15,6 +16,7 @@ type alias Model =
     { currentTab : Int
     , incDecModel : IncrementDecrementTab.Model
     , findFirstUniqueModel : FindFirstUniqueTab.Model
+    , issueTrackerModel : IssueTracker.Model
     }
 
 
@@ -23,6 +25,7 @@ initialModel =
     { currentTab = 0
     , incDecModel = IncrementDecrementTab.initialModel
     , findFirstUniqueModel = FindFirstUniqueTab.initialModel
+    , issueTrackerModel = IssueTracker.initialModel
     }
 
 
@@ -30,6 +33,7 @@ type Msg
     = SelectTab Int
     | IncDecMsg IncrementDecrementTab.Msg
     | FindFirstUniqueMsg FindFirstUniqueTab.Msg
+    | IssueTrackerMsg IssueTracker.Msg
 
 
 update : Msg -> Model -> Model
@@ -43,6 +47,13 @@ update msg model =
 
         FindFirstUniqueMsg findFirstUniqueMsg ->
             { model | findFirstUniqueModel = FindFirstUniqueTab.update findFirstUniqueMsg model.findFirstUniqueModel }
+
+        IssueTrackerMsg issueTrackerMsg ->
+            let
+                ( issueTrackerModel, cmd ) =
+                    IssueTracker.update issueTrackerMsg model.issueTrackerModel
+            in
+                { model | issueTrackerModel = issueTrackerModel }
 
 
 {-| A plain old record holding a couple of theme colors.
@@ -92,6 +103,7 @@ view model =
                 , Mwc.Tabs.tabText
                     [ text "Inc/Dec"
                     , text "Find 1st unique"
+                    , text "IssueTracker"
                     ]
                 ]
             , tabContentView model
@@ -105,8 +117,11 @@ tabContentView model =
         0 ->
             map IncDecMsg (IncrementDecrementTab.view model.incDecModel)
 
-        _ ->
+        1 ->
             map FindFirstUniqueMsg (FindFirstUniqueTab.view model.findFirstUniqueModel)
+
+        _ ->
+            map IssueTrackerMsg (IssueTracker.view model.issueTrackerModel)
 
 
 main =
