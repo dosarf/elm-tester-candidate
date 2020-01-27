@@ -2,13 +2,12 @@ module IssueTracker exposing (Model, Msg, init, tabText, update, view)
 
 import User exposing (User, usersDecoder)
 
-import Css exposing (px, width)
-import Html.Styled exposing (Html, div, label, li, text, ul)
+import Css exposing (backgroundColor, border3, borderColor, hex, hover, px, solid, width)
+import Html.Styled exposing (Html, div, label, li, span, text, ul)
 import Html.Styled.Attributes exposing (css)
 import Mwc.Button
 import Mwc.TextField
 import Http
--- import Result exposing
 import Issue exposing (Issue, issuesDecoder)
 
 
@@ -35,7 +34,6 @@ tabText model =
 type Msg
     = IssuesDownloaded (Result Http.Error (List Issue))
     | UsersDownloaded (Result Http.Error (List User))
-    | Nop
 
 
 downloadUsers : Cmd Msg
@@ -71,6 +69,21 @@ init () =
       }
     , downloadUsers
     )
+
+
+-- for testing
+offlineModel : Model
+offlineModel =
+    let
+        user =
+            User 42 "John" "Doe"
+    in
+        { user = Just user
+        , issues =
+            [ Issue 12 "Do all" Issue.LOW "'nuff said!" user
+            , Issue 13 "Do nothing at all" Issue.HIGH "yeah, baby" user
+            ]
+        }
 
 
 httpErrorToString : Http.Error -> String
@@ -118,7 +131,8 @@ update msg model =
                         _ =
                             Debug.log "USERS HTTP ERROR" <| httpErrorToString httpError
                     in
-                        ( model
+                        ( offlineModel
+                        -- model
                         , Cmd.none
                         )
 
@@ -136,16 +150,41 @@ update msg model =
                         )
 
 
-        Nop ->
-            ( model
-            , Cmd.none
-            )
+editIcon : String
+editIcon =
+    "\u{270E}"
+
+
+closeIcon : String
+closeIcon =
+    "\u{274C}"
+
+
+issueSummaryView : Issue -> Html Msg
+issueSummaryView issue =
+    span
+        []
+        [ text <| (String.fromInt issue.id) ++ ": " ++ issue.summary
+        , span
+            [ css
+                [ border3 (px 2) solid (hex "ffffff")
+                , backgroundColor (hex "ffffff")
+                , hover
+                    [ borderColor (hex "55af6a")
+                    , backgroundColor (hex "55af6a")
+                    ]
+                ]
+            ]
+            [ text editIcon]
+        ]
+
 
 
 issuesListItems: Model -> List(Html Msg)
 issuesListItems model =
     model.issues
-        |> List.map (\issue -> li [] [ text <| (String.fromInt issue.id) ++ ": " ++ issue.summary ])
+        |> List.map (\issue -> li [] [ issueSummaryView issue ])
+
 
 issuesView : Model -> Html Msg
 issuesView model =
@@ -156,6 +195,7 @@ issuesView model =
               []
               (issuesListItems model)
         ]
+
 
 view : Model -> Html Msg
 view model =
