@@ -1,4 +1,4 @@
-module Issue exposing (Issue, Priority(..), issueDecoder, issuesDecoder, issueEncoder)
+module Issue exposing (Issue, Priority(..), title, issueDecoder, issuesDecoder, issueEncoder, priorities, priorityFromString, priorityToString)
 
 import User exposing (User, userEncoder, userDecoder)
 
@@ -10,6 +10,11 @@ type Priority
     | MEDIUM
     | LOW
 
+
+priorities : List Priority
+priorities = [ HIGH, MEDIUM, LOW ]
+
+
 type alias Issue =
   { id : Int
   , summary : String
@@ -17,6 +22,11 @@ type alias Issue =
   , description : String
   , creator : User
   }
+
+
+title : Issue -> String
+title issue =
+    (String.fromInt issue.id) ++ " " ++ issue.summary
 
 
 priorityDecoder : Decode.Decoder Priority
@@ -44,6 +54,17 @@ priorityToString priority =
             "MEDIUM"
         LOW ->
             "LOW"
+
+
+priorityFromString : String -> Priority
+priorityFromString string =
+    case string of
+        "HIGH" ->
+            HIGH
+        "MEDIUM" ->
+            MEDIUM
+        _ ->
+            LOW
 
 
 issueDecoder : Decode.Decoder Issue

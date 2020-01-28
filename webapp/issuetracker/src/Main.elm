@@ -1,8 +1,8 @@
 module Main exposing (main)
 
 import Browser
-import Css exposing (Color, border3, borderColor, borderRadius, display, height, hex, hover, inlineBlock, padding, px, rgb, solid, width)
-import Html.Styled exposing (Html, div, header, img, main_, map, text, toUnstyled)
+import Css exposing (Color, border3, borderColor, borderRadius, display, height, hex, hover, inlineBlock, padding, px, rgb, solid, vw, width)
+import Html.Styled exposing (Html, div, header, img, main_, text, toUnstyled)
 import Html.Styled.Attributes exposing (css, src)
 import IssueTracker
 import Mwc.Button
@@ -84,32 +84,35 @@ logo =
 
 view : Model -> Html Msg
 view model =
-    main_ []
-        [ header
-            []
-            [ div
+    let
+        tabTexts =
+            IssueTracker.tabTextList model.issueTrackerModel
+                |> List.map (Html.Styled.map IssueTrackerMsg)
+    in
+        main_ []
+            [ header
                 []
-                [ logo ]
-            ]
-        , div
-            [ css [ width (px 400) ] ]
-            [ Mwc.Tabs.view
-                [ Mwc.Tabs.selected model.currentTab
-                , Mwc.Tabs.onClick SelectTab
-                , Mwc.Tabs.tabText
-                    [ text <| IssueTracker.tabText model.issueTrackerModel
-                    ]
+                [ div
+                    []
+                    [ logo ]
                 ]
-            , tabContentView model
+            , div
+                [ css [ width (vw 100) ] ]
+                [ Mwc.Tabs.view
+                    [ Mwc.Tabs.selected model.currentTab
+                    , Mwc.Tabs.onClick SelectTab
+                    , Mwc.Tabs.tabText tabTexts
+                    ]
+                , tabContentView model
+                ]
             ]
-        ]
 
 
 tabContentView : Model -> Html Msg
 tabContentView model =
     case model.currentTab of
         _ ->
-            map IssueTrackerMsg (IssueTracker.view model.issueTrackerModel)
+            Html.Styled.map IssueTrackerMsg (IssueTracker.view model.currentTab model.issueTrackerModel)
 
 
 subscriptions : Model -> Sub Msg
