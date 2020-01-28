@@ -2,10 +2,8 @@ module Main exposing (main)
 
 import Browser
 import Css exposing (Color, border3, borderColor, borderRadius, display, height, hex, hover, inlineBlock, padding, px, rgb, solid, width)
-import FindFirstUniqueTab
 import Html.Styled exposing (Html, div, header, img, main_, map, text, toUnstyled)
 import Html.Styled.Attributes exposing (css, src)
-import IncrementDecrementTab
 import IssueTracker
 import Mwc.Button
 import Mwc.Tabs
