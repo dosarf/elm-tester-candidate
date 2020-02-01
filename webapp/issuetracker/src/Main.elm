@@ -2,8 +2,8 @@ module Main exposing (main)
 
 import Browser
 import Css exposing (Color, border3, borderColor, borderRadius, display, height, hex, hover, inlineBlock, padding, px, rgb, solid, vw, width)
-import Html.Styled exposing (Html, div, header, img, main_, text, toUnstyled)
-import Html.Styled.Attributes exposing (css, src)
+import Html.Styled exposing (Html, div, header, h1, main_, text, toUnstyled)
+import Html.Styled.Attributes exposing (class, css, src)
 import IssueTracker
 import Mwc.Button
 import Mwc.Tabs
@@ -52,34 +52,13 @@ update msg model =
                 )
 
 
-{-| A plain old record holding a couple of theme colors.
--}
-theme : { secondary : Color, primary : Color }
-theme =
-    { primary = hex "55af6a"
-    , secondary = rgb 250 240 230
-    }
-
-
 {-| A logo image, with inline styles that change on hover.
 -}
 logo : Html msg
 logo =
-    img
-        [ src "assets/free-logo.png"
-        , css
-            [ display inlineBlock
-            , height (px 53)
-            , width (px 128)
-            , padding (px 20)
-            , border3 (px 5) solid (rgb 120 120 120)
-            , hover
-                [ borderColor theme.primary
-                , borderRadius (px 10)
-                ]
-            ]
-        ]
-        []
+    h1
+        [ class "px3 py1" ]
+        [ text "IssueTracker" ]
 
 
 view : Model -> Html Msg

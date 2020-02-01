@@ -3,8 +3,8 @@ module IssueTracker exposing (Model, Msg, init, tabTextList, update, view)
 import User exposing (User, usersDecoder)
 
 import Css exposing (backgroundColor, border3, borderColor, hex, hover, px, solid, width)
-import Html.Styled exposing (Html, div, input, label, li, option, select, span, text, ul)
-import Html.Styled.Attributes exposing (css, class, selected, value)
+import Html.Styled exposing (button, div, form, Html, input, label, option, select, span, text, textarea)
+import Html.Styled.Attributes exposing (css, class, rows, selected, value)
 import Html.Styled.Events exposing (onClick, onInput)
 import Mwc.Button
 import Mwc.TextField
@@ -269,7 +269,7 @@ issueSummaryView issue =
                 ]
             , onClick <| OpenIssueTab issue.id
             ]
-            [ text editIcon]
+            [ text editIcon ]
         ]
 
 
@@ -280,74 +280,85 @@ issuesListItems model =
         |> Dict.toList
         |> List.sortBy Tuple.first
         |> List.map Tuple.second
-        |> List.map (\issue -> li [] [ issueSummaryView issue ])
+        |> List.map (\issue -> div [] [ issueSummaryView issue ])
 
 
 issuesView : Model -> Html Msg
 issuesView model =
     div
-        []
-        [ label [] [ text "Issues: " ]
-        ,  ul
+        [ class "ml2 sm-col-6" ]
+        [ div
+            [ class "p2 bold white bg-blue" ]
+            [ text "Issues" ]
+        ,  div
               []
               (issuesListItems model)
         ]
 
-
+-- https://basscss.com/v7/docs/base-forms/
 issueEditorView : EditingIssue -> Html Msg
 issueEditorView editingIssue =
-    div [ class "m3 max-width-3" ]
-        [ -- (String.fromInt editingIssue.id)
-        -- ,
-          div [ class "col col-2" ] [ text "Summary" ]
-        , input [ class "h4 col col-10 mb3 bold"
-                , value editingIssue.issue.summary
-                -- , onInput SummaryChanged
-                ]
-                []
-        , fieldRow "Priority"
-              ( fieldSelect
-                Issue.priorities
-                editingIssue.issue.priority
-                Issue.priorityToString
-                (Issue.priorityFromString >> (PriorityChanged editingIssue.id))
-              )
-        , div [ class "col col-12" ]
-              [ span [] [ text "Description" ]
-              , input
-                  [ class "h4 col col-10 mb3 bold"
-                  , value editingIssue.issue.description
-                  -- , onInput DescriptionChanged
-                  ]
-                  []
+    div [ class "ml2 sm-col-6" ]
+        [ div
+            []
+            [ div
+                [ class "p2 bold white bg-blue" ]
+                [ text <| "Issue #" ++ (String.fromInt editingIssue.id) ]
+            ]
+        , label
+              []
+              [ text "Summary" ]
+        , input
+              [ class "block col-12 mb1 field"
+              , value editingIssue.issue.summary
+              -- , onInput SummaryChanged
               ]
+              []
+        , label
+              []
+              [ text "Priority" ]
+        , fieldSelect
+              Issue.priorities
+              editingIssue.issue.priority
+              Issue.priorityToString
+              (Issue.priorityFromString >> (PriorityChanged editingIssue.id))
+        , label
+            [ ]
+            [ text "Description" ]
+        , textarea
+            [ class "block col-12 mb1 field"
+            , rows 20
+            , value editingIssue.issue.description
+            -- , onInput DescriptionChanged
+            ]
+            []
+        , button
+            [ class "btn btn-primary"
+            -- , onClick
+            ]
+            [ text "Save" ]
+        , button
+            [ class "btn btn-primary black bg-gray"
+            -- , onClick
+            ]
+            [ text "Cancel" ]
         ]
-
-
-fieldRow : String -> Html Msg -> Html Msg
-fieldRow displayName gadget =
-  div []
-      [ div [ class "mb1 col col-2" ]
-            [ text displayName ]
-      , div [ class "mb1 col col-10" ]
-            [ gadget ]
-      ]
 
 
 fieldSelect : List a -> a -> (a -> String) -> (String -> Msg) -> Html Msg
 fieldSelect options currentValue optionToString onInputMsg =
-  let
-    fieldOption v =
-        option [ value <| optionToString v
-               , selected (v == currentValue)
-               ]
-               [ text <| optionToString v ]
-  in
-    select
-        [ class "bold"
-        , onInput <| onInputMsg
-        ]
-        (List.map fieldOption options)
+    let
+      fieldOption v =
+          option [ value <| optionToString v
+                 , selected (v == currentValue)
+                 ]
+                 [ text <| optionToString v ]
+    in
+      select
+          [ class "block col-4 mb1 field"
+          , onInput <| onInputMsg
+          ]
+          (List.map fieldOption options)
 
 
 editingIssueView : Int -> Model -> Html Msg
