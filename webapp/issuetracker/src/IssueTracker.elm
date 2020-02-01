@@ -11,6 +11,7 @@ import Mwc.TextField
 import Http
 import Issue exposing (Issue, issuesDecoder, priorityToString)
 import Dict exposing (Dict)
+import FontAwesome
 
 -- CONSTANTS
 
@@ -23,14 +24,18 @@ usersUri =
     "../../user/"
 
 
-editIcon : String
+editIcon : Html Msg
 editIcon =
-    "\u{270E}"
+    span
+        [ class "ml1" ]
+        [ (FontAwesome.icon FontAwesome.edit) |> Html.Styled.fromUnstyled ]
 
 
-closeIcon : String
+closeIcon : Html Msg
 closeIcon =
-    "\u{274C}"
+    span
+        [ class "ml1" ]
+        [ (FontAwesome.icon FontAwesome.windowClose) |> Html.Styled.fromUnstyled ]
 
 -- MODEL
 
@@ -53,17 +58,19 @@ mainTabText model =
         |> Maybe.map User.displayName
         |> Maybe.map (\displayName -> "Issues (" ++ displayName ++ ")")
         |> Maybe.withDefault "(no user)"
-        |> text
+        |> (\txt -> span [ class "h3" ] [ text txt ])
 
 
+-- TODO rename this is not tab text
+-- TODO the summary is to be cut to N chars for the tab text
 issueEditorTabText : Issue -> Html Msg
 issueEditorTabText issue =
     span
-        []
+        [ class "h3" ]
         [ text <| Issue.title issue
-        , text " "
         , span
-            [ onClick <| CloseIssueTab issue.id
+            [ class "ml1"
+            , onClick <| CloseIssueTab issue.id
             , css
                 [ hover
                       [ borderColor (hex "55af6a")
@@ -71,10 +78,11 @@ issueEditorTabText issue =
                       ]
                 ]
             ]
-            [ text closeIcon ]
+            [ closeIcon ]
         ]
 
 
+-- TODO rename this is not tab text
 tabTextList : Model -> List (Html Msg)
 tabTextList model =
     let
@@ -255,8 +263,8 @@ update msg model =
 
 issueSummaryView : Issue -> Html Msg
 issueSummaryView issue =
-    span
-        []
+    div
+        [ class "h3" ]
         [ text <| Issue.title issue
         , span
             [ css
@@ -269,7 +277,7 @@ issueSummaryView issue =
                 ]
             , onClick <| OpenIssueTab issue.id
             ]
-            [ text editIcon ]
+            [ editIcon ]
         ]
 
 

@@ -8,6 +8,7 @@ import IssueTracker
 import Mwc.Button
 import Mwc.Tabs
 import Mwc.TextField
+import FontAwesome
 
 
 type alias Model =
@@ -69,7 +70,8 @@ view model =
                 |> List.map (Html.Styled.map IssueTrackerMsg)
     in
         main_ []
-            [ header
+            [ FontAwesome.useCss |> Html.Styled.fromUnstyled
+            , header
                 []
                 [ div
                     []
