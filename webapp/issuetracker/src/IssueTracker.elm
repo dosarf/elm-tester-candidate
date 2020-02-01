@@ -40,8 +40,7 @@ closeIcon =
 -- MODEL
 
 type alias EditingIssue =
-    { id : Int
-    , isEdited : Bool
+    { isEdited : Bool
     , isNew : Bool
     , issue : Issue
     }
@@ -87,6 +86,7 @@ tabTextList model =
     let
         editorTabTexts =
             model.editingIssues
+                |> List.map .issue
                 |> List.map .id
                 |> List.map (\issueId -> Dict.get issueId model.issues)
                 |> List.map (\issueMaybe -> Maybe.map issueEditorTabText issueMaybe |> Maybe.withDefault (text "(unknown)") )
@@ -233,7 +233,7 @@ update msg model =
         OpenIssueTab issueId ->
             let
                 alreadyEdited =
-                    List.filter (\issue -> issueId == issue.id) model.editingIssues
+                    List.filter (\editingIssue -> issueId == editingIssue.issue.id) model.editingIssues
                         |> List.head
                         |> Maybe.map (\_ -> True)
                         |> Maybe.withDefault False
@@ -244,7 +244,7 @@ update msg model =
                         else
                             model.editingIssues
                             ++ ( Dict.get issueId model.issues
-                                |> Maybe.map (\issue -> [ EditingIssue issueId False False issue ])
+                                |> Maybe.map (\issue -> [ EditingIssue False False issue ])
                                 |> Maybe.withDefault []
                               )
             in
@@ -253,7 +253,7 @@ update msg model =
                 )
 
         CloseIssueTab issueId ->
-            ( { model | editingIssues = List.filter (\issue -> issue.id /= issueId) model.editingIssues }
+            ( { model | editingIssues = List.filter (\editingIssue -> editingIssue.issue.id /= issueId) model.editingIssues }
             , Cmd.none
             )
 
@@ -312,7 +312,7 @@ issueEditorView editingIssue =
             []
             [ div
                 [ class "p2 h2 bold" ]
-                [ text <| "Issue #" ++ (String.fromInt editingIssue.id) ]
+                [ text <| "Issue #" ++ (String.fromInt editingIssue.issue.id) ]
             ]
         , label
               []
@@ -330,7 +330,7 @@ issueEditorView editingIssue =
               Issue.types
               editingIssue.issue.type_
               Issue.typeToString
-              (Issue.typeFromString >> (TypeChanged editingIssue.id))
+              (Issue.typeFromString >> (TypeChanged editingIssue.issue.id))
         , label
               []
               [ text "Priority" ]
@@ -338,9 +338,9 @@ issueEditorView editingIssue =
               Issue.priorities
               editingIssue.issue.priority
               Issue.priorityToString
-              (Issue.priorityFromString >> (PriorityChanged editingIssue.id))
+              (Issue.priorityFromString >> (PriorityChanged editingIssue.issue.id))
         , label
-            [ ]
+            []
             [ text "Description" ]
         , textarea
             [ class "block col-12 mb1 field"
