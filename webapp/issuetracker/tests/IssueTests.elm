@@ -18,11 +18,11 @@ user =
     User 42 "John" "Doe"
 
 issueJson =
-    """{"id":24,"summary":"Implement all","priority":"LOW","description":"'nuff said!","creator":""" ++ userJson ++ "}"
+    """{"id":24,"summary":"Implement all","type":"ENHANCEMENT","priority":"LOW","description":"'nuff said!","creator":""" ++ userJson ++ "}"
 
 issue : Issue
 issue =
-    Issue 24 "Implement all" Issue.LOW "'nuff said!" user
+    Issue 24 "Implement all" Issue.ENHANCEMENT Issue.LOW "'nuff said!" user
 
 testSuite =
     describe "Issue test cases"

@@ -70,6 +70,7 @@ public class IssueTrackerController {
 
         Issue copy = new Issue(
                 issue.getSummary(),
+                issue.getType(),
                 issue.getPriority(),
                 issue.getDescription(),
                 creator);

@@ -101,6 +101,7 @@ type Msg
     | OpenIssueTab Int
     | CloseIssueTab Int
     | PriorityChanged Int Issue.Priority
+    | TypeChanged Int Issue.Type
 
 
 downloadUsers : Cmd Msg
@@ -155,8 +156,8 @@ offlineModel =
     in
         { user = Just user
         , issues =
-            [ Issue 12 "Do all" Issue.LOW "'nuff said!" user
-            , Issue 13 "Do nothing at all" Issue.HIGH "yeah, baby" user
+            [ Issue 12 "Do all" Issue.ENHANCEMENT Issue.LOW "'nuff said!" user
+            , Issue 13 "Do nothing at all" Issue.DEFECT Issue.HIGH "yeah, baby" user
             ]
                 |> issueListToDict
         , editingIssues = []
@@ -259,6 +260,9 @@ update msg model =
         PriorityChanged issueId priority ->
             ( model, Cmd.none )
 
+        TypeChanged issued type_ ->
+            ( model, Cmd.none )
+
 
 issueSummaryView : Issue -> Html Msg
 issueSummaryView issue =
@@ -293,7 +297,7 @@ issuesView model =
     div
         [ class "ml2 sm-col-6" ]
         [ div
-            [ class "p2 bold white bg-blue" ]
+            [ class "p2 h2 bold" ]
             [ text "Issues" ]
         ,  div
               []
@@ -307,7 +311,7 @@ issueEditorView editingIssue =
         [ div
             []
             [ div
-                [ class "p2 bold white bg-blue" ]
+                [ class "p2 h2 bold" ]
                 [ text <| "Issue #" ++ (String.fromInt editingIssue.id) ]
             ]
         , label
@@ -319,6 +323,14 @@ issueEditorView editingIssue =
               -- , onInput SummaryChanged
               ]
               []
+        , label
+              []
+              [ text "Type" ]
+        , fieldSelect
+              Issue.types
+              editingIssue.issue.type_
+              Issue.typeToString
+              (Issue.typeFromString >> (TypeChanged editingIssue.id))
         , label
               []
               [ text "Priority" ]

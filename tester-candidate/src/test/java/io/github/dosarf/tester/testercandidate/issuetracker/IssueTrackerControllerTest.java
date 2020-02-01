@@ -1,9 +1,6 @@
 package io.github.dosarf.tester.testercandidate.issuetracker;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.dosarf.tester.testercandidate.calculator.CalculationRequest;
-import io.github.dosarf.tester.testercandidate.calculator.CalculationResponse;
 import io.github.dosarf.tester.testercandidate.user.User;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
@@ -50,6 +47,7 @@ public class IssueTrackerControllerTest {
 
         Issue issue = new Issue(
                 "test-summary",
+                Issue.Type.ENHANCEMENT,
                 Issue.Priority.MEDIUM,
                 "test-description",
                 creator);
@@ -59,6 +57,7 @@ public class IssueTrackerControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/issue/").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content(issueJson))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("summary", Matchers.is("test-summary")))
+                .andExpect(MockMvcResultMatchers.jsonPath("type", Matchers.is("ENHANCEMENT")))
                 .andExpect(MockMvcResultMatchers.jsonPath("priority", Matchers.is("MEDIUM")))
                 .andExpect(MockMvcResultMatchers.jsonPath("description", Matchers.is("test-description")))
                 .andExpect(MockMvcResultMatchers.jsonPath("creator.firstName", Matchers.is("John")))

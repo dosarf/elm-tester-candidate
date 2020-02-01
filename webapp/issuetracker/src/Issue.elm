@@ -1,9 +1,46 @@
-module Issue exposing (Issue, Priority(..), title, issueDecoder, issuesDecoder, issueEncoder, priorities, priorityFromString, priorityToString)
+module Issue exposing (
+    Issue,
+    Type(..), types, typeFromString, typeToString,
+    Priority(..), priorities, priorityFromString, priorityToString,
+    title, issueDecoder, issuesDecoder, issueEncoder)
 
 import User exposing (User, userEncoder, userDecoder)
 
 import Json.Decode as Decode
 import Json.Encode as Encode
+
+
+type Type
+    = DEFECT
+    | ENHANCEMENT
+
+
+types : List Type
+types = [ DEFECT, ENHANCEMENT ]
+
+
+typeDecoder : Decode.Decoder Type
+typeDecoder =
+    Decode.string
+        |> Decode.andThen (\str ->
+            case str of
+                "DEFECT" ->
+                    Decode.succeed DEFECT
+                "ENHANCEMENT" ->
+                    Decode.succeed ENHANCEMENT
+                whatEver ->
+                    Decode.fail <| "Unknown priority: " ++ whatEver
+        )
+
+
+typeToString : Type -> String
+typeToString type_ =
+    case type_ of
+        DEFECT ->
+            "DEFECT"
+        ENHANCEMENT ->
+            "ENHANCEMENT"
+
 
 type Priority
     = HIGH
@@ -11,22 +48,17 @@ type Priority
     | LOW
 
 
+typeFromString : String -> Type
+typeFromString string =
+    case string of
+        "DEFECT" ->
+            DEFECT
+        _ ->
+            ENHANCEMENT
+
+
 priorities : List Priority
 priorities = [ HIGH, MEDIUM, LOW ]
-
-
-type alias Issue =
-  { id : Int
-  , summary : String
-  , priority : Priority
-  , description : String
-  , creator : User
-  }
-
-
-title : Issue -> String
-title issue =
-    (String.fromInt issue.id) ++ " " ++ issue.summary
 
 
 priorityDecoder : Decode.Decoder Priority
@@ -67,11 +99,27 @@ priorityFromString string =
             LOW
 
 
+type alias Issue =
+  { id : Int
+  , summary : String
+  , type_ : Type
+  , priority : Priority
+  , description : String
+  , creator : User
+  }
+
+
+title : Issue -> String
+title issue =
+    "#" ++ (String.fromInt issue.id) ++ " " ++ issue.summary
+
+
 issueDecoder : Decode.Decoder Issue
 issueDecoder =
-    Decode.map5 Issue
+    Decode.map6 Issue
         (Decode.field "id" Decode.int)
         (Decode.field "summary" Decode.string)
+        (Decode.field "type" typeDecoder)
         (Decode.field "priority" priorityDecoder)
         (Decode.field "description" Decode.string)
         (Decode.field "creator" userDecoder)
@@ -82,6 +130,7 @@ issueEncoder issue =
     Encode.object
         [ ( "id", Encode.int issue.id )
         , ( "summary", Encode.string issue.summary )
+        , ( "type", Encode.string (typeToString issue.type_))
         , ( "priority", Encode.string (priorityToString issue.priority))
         , ( "description", Encode.string issue.description )
         , ( "creator", userEncoder issue.creator )

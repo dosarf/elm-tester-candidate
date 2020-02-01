@@ -9,6 +9,11 @@ import java.util.Objects;
 @Entity
 public class Issue {
 
+    public static enum Type {
+        DEFECT,
+        ENHANCEMENT
+    }
+
     public static enum Priority {
         HIGH,
         MEDIUM,
@@ -20,6 +25,7 @@ public class Issue {
     private Long id;
 
     private String summary;
+    private Type type;
     private Priority priority;
     private String description;
 
@@ -32,11 +38,13 @@ public class Issue {
     public Issue(
             Long id,
             String summary,
+            Type type,
             Priority priority,
             String description,
             User creator) {
         this.id = id;
         this.summary = summary;
+        this.type = type;
         this.priority = priority;
         this.description = description;
         this.creator = creator;
@@ -44,10 +52,11 @@ public class Issue {
 
     public Issue(
             String summary,
+            Type type,
             Priority priority,
             String description,
             User creator) {
-        this(null, summary, priority, description, creator);
+        this(null, summary, type, priority, description, creator);
     }
 
     public Long getId() {
@@ -57,6 +66,8 @@ public class Issue {
     public String getSummary() {
         return summary;
     }
+
+    public Type getType() { return type; }
 
     public Priority getPriority() {
         return priority;
@@ -75,6 +86,7 @@ public class Issue {
         return "Issue{" +
                 "id=" + id +
                 ", summary='" + summary + '\'' +
+                ", type=" + type +
                 ", priority=" + priority +
                 ", description='" + description + '\'' +
                 ", creator='" + creator + '\'' +
