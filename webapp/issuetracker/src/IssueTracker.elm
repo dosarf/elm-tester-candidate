@@ -2,7 +2,7 @@ module IssueTracker exposing (Model, Msg, init, tabTextList, update, view)
 
 import User exposing (User, usersDecoder)
 
-import Css exposing (backgroundColor, border3, borderColor, hex, hover, px, solid, width)
+import Css exposing (backgroundColor, border3, borderColor, cursor, hex, hover, pointer, px, solid, width)
 import Html.Styled exposing (button, div, form, Html, input, label, option, select, span, text, textarea)
 import Html.Styled.Attributes exposing (css, class, rows, selected, value)
 import Html.Styled.Events exposing (onClick, onInput)
@@ -73,8 +73,7 @@ issueEditorTabText issue =
             , onClick <| CloseIssueTab issue.id
             , css
                 [ hover
-                      [ borderColor (hex "55af6a")
-                      , backgroundColor (hex "55af6a")
+                      [ cursor pointer
                       ]
                 ]
             ]
@@ -271,9 +270,7 @@ issueSummaryView issue =
                 [ border3 (px 2) solid (hex "ffffff")
                 , backgroundColor (hex "ffffff")
                 , hover
-                    [ borderColor (hex "55af6a")
-                    , backgroundColor (hex "55af6a")
-                    ]
+                    [ cursor pointer ]
                 ]
             , onClick <| OpenIssueTab issue.id
             ]
