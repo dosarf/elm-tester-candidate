@@ -1,6 +1,8 @@
 module Issue exposing (
     Issue,
-    Type(..), types, typeFromString, typeToString,
+    Type(..),
+    firstNewIssueId, nextNewIssueId, isNewIssue,
+    newIssue, types, typeFromString, typeToString,
     Priority(..), priorities, priorityFromString, priorityToString,
     changeSummary, changeType, changePriority, changeDescription,
     title, issueDecoder, issuesDecoder, issueEncoder)
@@ -101,14 +103,43 @@ priorityFromString string =
 
 
 type alias Issue =
-  { id : Int
-  , summary : String
-  , type_ : Type
-  , priority : Priority
-  , description : String
-  , creator : User
-  }
+    { id : Int
+    , summary : String
+    , type_ : Type
+    , priority : Priority
+    , description : String
+    , creator : User
+    }
 
+
+-- TODO consider turning this Int into an opaque type, like NewIssueIdGenerator or something
+{- IDs of a newly created issue (i.e. not yet persisted) matters only from the point of
+   view of identifying correctly which new issue is being edited, in case there are multiple
+   such NEW issues are being created.
+-}
+firstNewIssueId : Int
+firstNewIssueId =
+    -1
+
+nextNewIssueId : Int -> Int
+nextNewIssueId newIssueId =
+    newIssueId - 1
+
+
+isNewIssue : Issue -> Bool
+isNewIssue issue =
+    issue.id < 0
+
+
+newIssue : Int -> User -> Issue
+newIssue id user =
+    { id = id
+    , summary = "Your summary here"
+    , type_ = ENHANCEMENT
+    , priority = LOW
+    , description = "Your description here"
+    , creator = user
+    }
 
 changeSummary : String -> Issue -> Issue
 changeSummary summary issue =

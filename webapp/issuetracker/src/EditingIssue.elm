@@ -1,8 +1,13 @@
-module EditingIssue exposing (Model, Msg(..), startEditingIssue, updateIssue, shouldSaveIssue, update, view)
+module EditingIssue exposing (
+    Model, Msg(..),
+    title,
+    newIssue, startEditingIssue, updateIssue, shouldSaveIssue, shouldCreateIssue,
+    update, view)
 
 import Html.Styled exposing (button, div, Html, input, label, option, select, text, textarea)
 import Html.Styled.Attributes exposing (class, disabled, rows, selected, value)
 import Html.Styled.Events exposing (onClick, onInput)
+import User exposing (User)
 import Issue exposing (Issue)
 
 
@@ -18,7 +23,49 @@ type Msg
     | TypeChanged Issue.Type
     | DescriptionChanged String
     | SaveIssue
+    | CreateIssue
 
+
+maxLimitedSummaryLength : Int
+maxLimitedSummaryLength =
+    13
+
+
+idString : Model -> String
+idString model =
+    if model.isNew
+        then
+            "NEW"
+        else
+            "#" ++ String.fromInt model.issue.id
+
+
+title : Model -> String
+title model =
+    let
+        modifiedPrefix =
+            if model.isEdited then "*" else ""
+
+        limitedSummary =
+            let
+                fullSummary = model.issue.summary
+            in
+                if String.length fullSummary <= maxLimitedSummaryLength
+                    then
+                        fullSummary
+                    else
+                        String.left maxLimitedSummaryLength fullSummary ++ "..."
+
+    in
+        modifiedPrefix ++ (idString model) ++ " " ++ limitedSummary
+
+
+newIssue : Int -> User -> Model
+newIssue id user =
+    { isEdited = False
+    , isNew = True
+    , issue = Issue.newIssue id user
+    }
 
 startEditingIssue : Issue -> Model
 startEditingIssue issue =
@@ -30,12 +77,18 @@ updateIssue issue model =
     { model
     | issue = issue
     , isEdited = False
+    , isNew = Issue.isNewIssue issue
     }
 
 
 shouldSaveIssue : Msg -> Bool
 shouldSaveIssue msg =
     msg == SaveIssue
+
+
+shouldCreateIssue : Msg -> Bool
+shouldCreateIssue msg =
+    msg == CreateIssue
 
 
 update : Msg -> Model -> Model
@@ -71,6 +124,9 @@ update msg model =
         SaveIssue ->
             model
 
+        CreateIssue ->
+            model
+
 
 -- https://basscss.com/v7/docs/base-forms/
 view : Model -> Html Msg
@@ -80,7 +136,7 @@ view model =
             []
             [ div
                 [ class "p2 h2 bold" ]
-                [ text <| "Issue #" ++ String.fromInt model.issue.id ]
+                [ text <| idString model ]
             ]
         , label
               []
@@ -120,9 +176,9 @@ view model =
         , button
             [ if not model.isEdited then (class "btn btn-primary black bg-silver") else (class "btn btn-primary")
             , disabled (not model.isEdited)
-            , onClick SaveIssue
+            , onClick <| if model.isNew then CreateIssue else SaveIssue
             ]
-            [ text "Save" ]
+            [ text <| if model.isNew then "Create" else "Save" ]
         ]
 
 

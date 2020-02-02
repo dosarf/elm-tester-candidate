@@ -4,8 +4,8 @@ import Dict exposing (Dict)
 import List.Extra as ListX
 
 import Css exposing (backgroundColor, border3, cursor, hex, hover, pointer, px, solid)
-import Html.Styled exposing (div, Html, span, text)
-import Html.Styled.Attributes exposing (css, class)
+import Html.Styled exposing (button, div, Html, span, text)
+import Html.Styled.Attributes exposing (css, class, disabled)
 import Html.Styled.Events exposing (onClick)
 import Http
 import FontAwesome
@@ -31,6 +31,11 @@ issueUpdateUri issue =
     "../" ++ String.fromInt issue.id
 
 
+issueCreateUri : String
+issueCreateUri =
+    "../"
+
+
 editIcon : Html Msg
 editIcon =
     span
@@ -44,12 +49,21 @@ closeIcon =
         [ class "ml1" ]
         [ FontAwesome.icon FontAwesome.windowClose |> Html.Styled.fromUnstyled ]
 
+
+createIcon : Html Msg
+createIcon =
+    span
+        [ class "ml1" ]
+        [ FontAwesome.icon FontAwesome.plusCircle |> Html.Styled.fromUnstyled ]
+
+
 -- MODEL
 
 type alias Model =
     { user : Maybe User
     , issues : Dict Int Issue
     , editingIssues : List EditingIssue.Model
+    , newIssueId : Int
     }
 
 
@@ -62,14 +76,14 @@ mainTab model =
         |> (\txt -> span [ class "h3" ] [ text txt ])
 
 
-issueEditorTab : Issue -> Html Msg
-issueEditorTab issue =
+issueEditorTab : EditingIssue.Model -> Html Msg
+issueEditorTab editingIssue =
     span
         [ class "h3" ]
-        [ text <| Issue.title issue
+        [ text <| EditingIssue.title editingIssue
         , span
             [ class "ml1"
-            , onClick <| CloseIssueTab issue.id
+            , onClick <| CloseIssueTab editingIssue.issue.id
             , css
                 [ hover
                       [ cursor pointer
@@ -85,10 +99,7 @@ tabList model =
     let
         editorTabTexts =
             model.editingIssues
-                |> List.map .issue
-                |> List.map .id
-                |> List.map (\issueId -> Dict.get issueId model.issues)
-                |> List.map (\issueMaybe -> Maybe.map issueEditorTab issueMaybe |> Maybe.withDefault (text "(unknown)") )
+                |> List.map issueEditorTab
     in
         mainTab model :: editorTabTexts
 
@@ -97,10 +108,12 @@ tabList model =
 type Msg
     = IssuesDownloaded (Result Http.Error (List Issue))
     | IssueUpdated Int (Result Http.Error Issue)
+    | IssueCreated Int (Result Http.Error Issue)
     | UsersDownloaded (Result Http.Error (List User))
     | OpenIssueTab Int
     | CloseIssueTab Int
     | EditingIssueMsg EditingIssue.Msg
+    | CreateNewIssue
 
 
 downloadUsersCmd : Cmd Msg
@@ -141,11 +154,25 @@ updateIssueCmd issue =
         }
 
 
+createIssueCmd : Issue -> Cmd Msg
+createIssueCmd issue =
+    Http.request
+        { method = "POST"
+        , headers = [ Http.header "Accept" "application/json" ]
+        , url = issueCreateUri
+        , body = Http.jsonBody <| Issue.issueEncoder issue
+        , expect = Http.expectJson (IssueCreated issue.id) Issue.issueDecoder
+        , timeout = Just <| 10.0 * 1000.0
+        , tracker = Nothing
+        }
+
+
 init : () -> ( Model, Cmd Msg )
 init () =
     ( { user = Nothing
       , issues = Dict.empty
       , editingIssues = []
+      , newIssueId = Issue.firstNewIssueId
       }
     , downloadUsersCmd
     )
@@ -172,6 +199,7 @@ offlineModel =
             ]
                 |> issueListToDict
         , editingIssues = []
+        , newIssueId = Issue.firstNewIssueId
         }
 
 
@@ -223,7 +251,7 @@ update msg editingIndex model =
                 -- revert model.editingIssues, model.issues remains as is
                 Err httpError ->
                     let
-                        _ = Debug.log "ISSUE SAVE HTTP ERROR" <| httpErrorToString httpError
+                        _ = Debug.log "ISSUE UPDATE HTTP ERROR" <| httpErrorToString httpError
                         editingIssues =
                             Dict.get issueId model.issues
                                 |> Maybe.map (\issue -> updateIssue issue model.editingIssues)
@@ -237,11 +265,31 @@ update msg editingIndex model =
                 Ok issue ->
                     let
                         _ =
-                            Debug.log "Issue saved" issue
+                            Debug.log "Issue updated" issue
                     in
                         ( { model
                           | issues = Dict.insert issue.id issue model.issues
                           , editingIssues = updateIssue issue model.editingIssues
+                          }
+                        , Cmd.none
+                        )
+
+        IssueCreated tmpIssueId result ->
+            case result of
+                Err httpError ->
+                    let
+                        _ = Debug.log "ISSUE CREATE HTTP ERROR" <| httpErrorToString httpError
+                    in
+                        ( model, Cmd.none )
+
+                Ok issue ->
+                    let
+                        _ =
+                            Debug.log "Issue created" issue
+                    in
+                        ( { model
+                          | issues = Dict.insert issue.id issue model.issues
+                          , editingIssues = updateCreatedIssue tmpIssueId issue model.editingIssues
                           }
                         , Cmd.none
                         )
@@ -327,18 +375,47 @@ update msg editingIndex model =
                                     then
                                         updateIssueCmd editingIssue.issue
                                     else
-                                        Cmd.none
-
+                                        if EditingIssue.shouldCreateIssue editingIssueMsg
+                                            then
+                                                createIssueCmd editingIssue.issue
+                                            else
+                                                Cmd.none
                         in
                             ( { model | editingIssues = editingIssues }
                             , saveCmd
                             )
+
+        CreateNewIssue ->
+            let
+                newIssueId =
+                    Issue.nextNewIssueId model.newIssueId
+
+                editingIssues =
+                    model.user
+                        |> Maybe.map (\user -> model.editingIssues ++ [ EditingIssue.newIssue newIssueId user ])
+                        |> Maybe.withDefault model.editingIssues
+            in
+                ( { model
+                  | editingIssues = editingIssues
+                  , newIssueId = newIssueId
+                  }
+                , Cmd.none
+                )
 
 
 updateIssue : Issue -> List EditingIssue.Model -> List EditingIssue.Model
 updateIssue issue editingIssues =
     ListX.updateIf
         (\editingIssue -> issue.id == editingIssue.issue.id)
+        (EditingIssue.updateIssue issue)
+        editingIssues
+
+
+-- tmpIssueId: the ID it had before saving the first time
+updateCreatedIssue : Int -> Issue -> List EditingIssue.Model -> List EditingIssue.Model
+updateCreatedIssue tmpIssueId issue editingIssues =
+    ListX.updateIf
+        (\editingIssue -> tmpIssueId == editingIssue.issue.id)
         (EditingIssue.updateIssue issue)
         editingIssues
 
@@ -378,7 +455,18 @@ issuesView model =
         [ div
             [ class "p2 h2 bold" ]
             [ text "Issues" ]
-        ,  div
+        , div
+            [ class "mb1 mt1" ]
+            [ button
+                [ class "btn btn-primary"
+                , disabled (model.user |> Maybe.map (\_ -> False) |> Maybe.withDefault True)
+                , onClick CreateNewIssue
+                ]
+                [ text "Create New"
+                , createIcon
+                ]
+            ]
+        , div
               []
               (issuesListItems model)
         ]
