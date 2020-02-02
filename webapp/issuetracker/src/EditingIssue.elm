@@ -1,9 +1,9 @@
 module EditingIssue exposing (Model, Msg(..), update, view)
 
-import Html.Styled exposing (button, div, form, Html, input, label, option, select, span, text, textarea)
-import Html.Styled.Attributes exposing (css, class, rows, selected, value)
-import Html.Styled.Events exposing (onClick, onInput)
-import Issue exposing (Issue, issuesDecoder)
+import Html.Styled exposing (button, div, Html, input, label, option, select, text, textarea)
+import Html.Styled.Attributes exposing (class, rows, selected, value)
+import Html.Styled.Events exposing (onInput)
+import Issue exposing (Issue)
 
 
 type alias Model =
@@ -35,7 +35,7 @@ view model =
             []
             [ div
                 [ class "p2 h2 bold" ]
-                [ text <| "Issue #" ++ (String.fromInt model.issue.id) ]
+                [ text <| "Issue #" ++ String.fromInt model.issue.id ]
             ]
         , label
               []
@@ -53,7 +53,7 @@ view model =
               Issue.types
               model.issue.type_
               Issue.typeToString
-              (Issue.typeFromString >> (TypeChanged model.issue.id))
+              (Issue.typeFromString >> TypeChanged model.issue.id)
         , label
               []
               [ text "Priority" ]
@@ -61,7 +61,7 @@ view model =
               Issue.priorities
               model.issue.priority
               Issue.priorityToString
-              (Issue.priorityFromString >> (PriorityChanged model.issue.id))
+              (Issue.priorityFromString >> PriorityChanged model.issue.id)
         , label
             []
             [ text "Description" ]

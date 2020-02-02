@@ -111,7 +111,7 @@ type alias Issue =
 
 title : Issue -> String
 title issue =
-    "#" ++ (String.fromInt issue.id) ++ " " ++ issue.summary
+    "#" ++ String.fromInt issue.id ++ " " ++ issue.summary
 
 
 issueDecoder : Decode.Decoder Issue

@@ -2,23 +2,21 @@ module IssueTracker exposing (Model, Msg, init, tabTextList, update, view)
 
 import User exposing (User, usersDecoder)
 
-import Css exposing (backgroundColor, border3, borderColor, cursor, hex, hover, pointer, px, solid, width)
-import Html.Styled exposing (button, div, form, Html, input, label, option, select, span, text, textarea)
-import Html.Styled.Attributes exposing (css, class, rows, selected, value)
-import Html.Styled.Events exposing (onClick, onInput)
-import Mwc.Button
-import Mwc.TextField
+import Css exposing (backgroundColor, border3, cursor, hex, hover, pointer, px, solid)
+import Html.Styled exposing (div, Html, span, text)
+import Html.Styled.Attributes exposing (css, class)
+import Html.Styled.Events exposing (onClick)
 import Http
 import Dict exposing (Dict)
 import FontAwesome
-import Issue exposing (Issue, issuesDecoder, priorityToString)
+import Issue exposing (Issue, issuesDecoder)
 import EditingIssue
 
 -- CONSTANTS
 
 userIssuesUri : User -> String
 userIssuesUri user =
-    "../../user/" ++ (String.fromInt user.id) ++ "/issue"
+    "../../user/" ++ String.fromInt user.id ++ "/issue"
 
 usersUri : String
 usersUri =
@@ -29,14 +27,14 @@ editIcon : Html Msg
 editIcon =
     span
         [ class "ml1" ]
-        [ (FontAwesome.icon FontAwesome.edit) |> Html.Styled.fromUnstyled ]
+        [ FontAwesome.icon FontAwesome.edit |> Html.Styled.fromUnstyled ]
 
 
 closeIcon : Html Msg
 closeIcon =
     span
         [ class "ml1" ]
-        [ (FontAwesome.icon FontAwesome.windowClose) |> Html.Styled.fromUnstyled ]
+        [ FontAwesome.icon FontAwesome.windowClose |> Html.Styled.fromUnstyled ]
 
 -- MODEL
 
@@ -88,7 +86,7 @@ tabTextList model =
                 |> List.map (\issueId -> Dict.get issueId model.issues)
                 |> List.map (\issueMaybe -> Maybe.map issueEditorTabText issueMaybe |> Maybe.withDefault (text "(unknown)") )
     in
-        [ mainTabText model ] ++ editorTabTexts
+        mainTabText model :: editorTabTexts
 
 
 

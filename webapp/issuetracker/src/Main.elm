@@ -1,13 +1,11 @@
 module Main exposing (main)
 
 import Browser
-import Css exposing (Color, border3, borderColor, borderRadius, display, height, hex, hover, inlineBlock, padding, px, rgb, solid, vw, width)
+import Css exposing (vw, width)
 import Html.Styled exposing (Html, div, header, h1, main_, text, toUnstyled)
-import Html.Styled.Attributes exposing (class, css, src)
+import Html.Styled.Attributes exposing (class, css)
 import IssueTracker
-import Mwc.Button
 import Mwc.Tabs
-import Mwc.TextField
 import FontAwesome
 
 
