@@ -9,9 +9,10 @@ import Html.Styled.Events exposing (onClick, onInput)
 import Mwc.Button
 import Mwc.TextField
 import Http
-import Issue exposing (Issue, issuesDecoder, priorityToString)
 import Dict exposing (Dict)
 import FontAwesome
+import Issue exposing (Issue, issuesDecoder, priorityToString)
+import EditingIssue
 
 -- CONSTANTS
 
@@ -39,17 +40,13 @@ closeIcon =
 
 -- MODEL
 
-type alias EditingIssue =
-    { isEdited : Bool
-    , isNew : Bool
-    , issue : Issue
-    }
-
 type alias Model =
     { user : Maybe User
     , issues : Dict Int Issue
-    , editingIssues : List EditingIssue
+    , editingIssues : List EditingIssue.Model
+    , editingIndex : Int
     }
+
 
 mainTabText : Model -> Html Msg
 mainTabText model =
@@ -100,8 +97,7 @@ type Msg
     | UsersDownloaded (Result Http.Error (List User))
     | OpenIssueTab Int
     | CloseIssueTab Int
-    | PriorityChanged Int Issue.Priority
-    | TypeChanged Int Issue.Type
+    | EditingIssueMsg EditingIssue.Msg
 
 
 downloadUsers : Cmd Msg
@@ -135,6 +131,7 @@ init () =
     ( { user = Nothing
       , issues = Dict.empty
       , editingIssues = []
+      , editingIndex = 0
       }
     , downloadUsers
     )
@@ -161,6 +158,7 @@ offlineModel =
             ]
                 |> issueListToDict
         , editingIssues = []
+        , editingIndex = 0
         }
 
 
@@ -179,8 +177,8 @@ httpErrorToString httpError =
             "BadBody: " ++ body
 
 
-update : Msg -> Model -> (Model, Cmd Msg)
-update msg model =
+update : Msg -> Int -> Model -> (Model, Cmd Msg)
+update msg editingIndex model =
     case msg of
         IssuesDownloaded result ->
             case result of
@@ -189,7 +187,7 @@ update msg model =
                         _ =
                             Debug.log "ISSUES HTTP ERROR" <| httpErrorToString httpError
                     in
-                        ( model
+                        ( { model | editingIndex = editingIndex }
                         , Cmd.none
                         )
 
@@ -201,7 +199,10 @@ update msg model =
                             issues
                                 |> issueListToDict
                     in
-                        ( { model | issues = newIssues }
+                        ( { model
+                          | issues = newIssues
+                          , editingIndex = editingIndex
+                          }
                         , Cmd.none
                         )
 
@@ -212,7 +213,7 @@ update msg model =
                         _ =
                             Debug.log "USERS HTTP ERROR" <| httpErrorToString httpError
                     in
-                        ( offlineModel
+                        ( { offlineModel | editingIndex = editingIndex }
                         -- model
                         , Cmd.none
                         )
@@ -224,7 +225,10 @@ update msg model =
                         firstUserMaybe =
                             List.head users
                     in
-                        ( { model | user = firstUserMaybe }
+                        ( { model
+                          | user = firstUserMaybe
+                          , editingIndex = editingIndex
+                          }
                         , firstUserMaybe
                             |> Maybe.map downloadIssuesOf
                             |> Maybe.withDefault Cmd.none
@@ -244,24 +248,43 @@ update msg model =
                         else
                             model.editingIssues
                             ++ ( Dict.get issueId model.issues
-                                |> Maybe.map (\issue -> [ EditingIssue False False issue ])
+                                |> Maybe.map (\issue -> [ EditingIssue.Model False False issue ])
                                 |> Maybe.withDefault []
                               )
             in
-                ( { model | editingIssues = editingIssues }
+                ( { model
+                  | editingIssues = editingIssues
+                  , editingIndex = editingIndex
+                  }
                 , Cmd.none
                 )
 
         CloseIssueTab issueId ->
-            ( { model | editingIssues = List.filter (\editingIssue -> editingIssue.issue.id /= issueId) model.editingIssues }
+            ( { model
+              | editingIssues = List.filter (\editingIssue -> editingIssue.issue.id /= issueId) model.editingIssues
+              , editingIndex = editingIndex
+              }
             , Cmd.none
             )
 
-        PriorityChanged issueId priority ->
-            ( model, Cmd.none )
+        EditingIssueMsg editingIssueMsg ->
+            ( { model | editingIndex = editingIndex }
+            , Cmd.none
+            )
+        {-
+            let
+                currentEditingIssue =
 
-        TypeChanged issued type_ ->
-            ( model, Cmd.none )
+                ( editingIssueModel, cmd ) =
+
+            in
+                ( { model
+                  | editingIssueModel = editingIssueModel
+                  , editingIndex = editingIndex
+                  }
+                , Cmd.map EditingIssueMsg cmd
+                )
+        -}
 
 
 issueSummaryView : Issue -> Html Msg
@@ -304,79 +327,6 @@ issuesView model =
               (issuesListItems model)
         ]
 
--- https://basscss.com/v7/docs/base-forms/
-issueEditorView : EditingIssue -> Html Msg
-issueEditorView editingIssue =
-    div [ class "ml2 sm-col-6" ]
-        [ div
-            []
-            [ div
-                [ class "p2 h2 bold" ]
-                [ text <| "Issue #" ++ (String.fromInt editingIssue.issue.id) ]
-            ]
-        , label
-              []
-              [ text "Summary" ]
-        , input
-              [ class "block col-12 mb1 field"
-              , value editingIssue.issue.summary
-              -- , onInput SummaryChanged
-              ]
-              []
-        , label
-              []
-              [ text "Type" ]
-        , fieldSelect
-              Issue.types
-              editingIssue.issue.type_
-              Issue.typeToString
-              (Issue.typeFromString >> (TypeChanged editingIssue.issue.id))
-        , label
-              []
-              [ text "Priority" ]
-        , fieldSelect
-              Issue.priorities
-              editingIssue.issue.priority
-              Issue.priorityToString
-              (Issue.priorityFromString >> (PriorityChanged editingIssue.issue.id))
-        , label
-            []
-            [ text "Description" ]
-        , textarea
-            [ class "block col-12 mb1 field"
-            , rows 20
-            , value editingIssue.issue.description
-            -- , onInput DescriptionChanged
-            ]
-            []
-        , button
-            [ class "btn btn-primary"
-            -- , onClick
-            ]
-            [ text "Save" ]
-        , button
-            [ class "btn btn-primary black bg-gray"
-            -- , onClick
-            ]
-            [ text "Cancel" ]
-        ]
-
-
-fieldSelect : List a -> a -> (a -> String) -> (String -> Msg) -> Html Msg
-fieldSelect options currentValue optionToString onInputMsg =
-    let
-      fieldOption v =
-          option [ value <| optionToString v
-                 , selected (v == currentValue)
-                 ]
-                 [ text <| optionToString v ]
-    in
-      select
-          [ class "block col-4 mb1 field"
-          , onInput <| onInputMsg
-          ]
-          (List.map fieldOption options)
-
 
 editingIssueView : Int -> Model -> Html Msg
 editingIssueView issueIndex model =
@@ -385,8 +335,9 @@ editingIssueView issueIndex model =
         |> List.filter (\(index, issue) -> index == issueIndex)
         |> List.map Tuple.second
         |> List.head
-        |> Maybe.map issueEditorView
-        |> Maybe.withDefault (div [] [ text "Issue not found" ])
+        |> Maybe.map EditingIssue.view
+        |> Maybe.map (Html.Styled.map EditingIssueMsg)
+        |> Maybe.withDefault (div [] [ text "(select a tab)" ])
 
 
 view : Int -> Model -> Html Msg

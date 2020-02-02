@@ -45,8 +45,9 @@ update msg model =
 
         IssueTrackerMsg issueTrackerMsg ->
             let
+                editingIndex = model.currentTab - 1
                 ( issueTrackerModel, cmd ) =
-                    IssueTracker.update issueTrackerMsg model.issueTrackerModel
+                    IssueTracker.update issueTrackerMsg editingIndex model.issueTrackerModel
             in
                 ( { model | issueTrackerModel = issueTrackerModel }
                 , Cmd.map IssueTrackerMsg cmd
