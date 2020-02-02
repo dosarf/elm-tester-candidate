@@ -1,4 +1,4 @@
-module IssueTracker exposing (Model, Msg, init, tabList, update, view)
+module IssueTracker exposing (Model, Msg, editingIssueCount, init, tabList, update, view)
 
 import Dict exposing (Dict)
 import List.Extra as ListX
@@ -65,6 +65,11 @@ type alias Model =
     , editingIssues : List EditingIssue.Model
     , newIssueId : Int
     }
+
+
+editingIssueCount : Model -> Int
+editingIssueCount model =
+    List.length model.editingIssues
 
 
 mainTab : Model -> Html Msg

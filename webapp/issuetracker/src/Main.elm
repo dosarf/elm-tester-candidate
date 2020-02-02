@@ -37,9 +37,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectTab newTab ->
-            ( { model | currentTab = newTab }
-            , Cmd.none
-            )
+            let
+                _ =
+                    Debug.log "NEW TAB" newTab
+                -- after closing an issue, it sort of gets selected
+                isStrayTab =
+                    IssueTracker.editingIssueCount model.issueTrackerModel < newTab
+            in
+                ( { model | currentTab = if isStrayTab then 0 else newTab }
+                , Cmd.none
+                )
 
         IssueTrackerMsg issueTrackerMsg ->
             let
