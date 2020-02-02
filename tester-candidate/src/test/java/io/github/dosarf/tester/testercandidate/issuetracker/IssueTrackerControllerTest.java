@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -76,14 +78,13 @@ public class IssueTrackerControllerTest {
     @Test
     @Order(3)
     public void list_all_created_by() throws Exception {
-        // TODO there's got to be a seriously better way than this
-        String[] responseJson = new String[1];
+        ResponseJson responseJson = new ResponseJson();
 
         mvc.perform(MockMvcRequestBuilders.get("/user/").accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(result -> responseJson[0] = result.getResponse().getContentAsString());
+                .andDo(result -> responseJson.setJson(result.getResponse().getContentAsString()));
 
-        User[] users = objectMapper.readValue(responseJson[0], User[].class);
+        User[] users = objectMapper.readValue(responseJson.getJson(), User[].class);
 
         Long userId = Stream
                 .of(users)
@@ -95,5 +96,56 @@ public class IssueTrackerControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/user/" + userId + "/issue").accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("[0].summary", Matchers.is("test-summary")));
+    }
+
+    @Test
+    @Order(4)
+    public void update() throws Exception {
+        ResponseJson responseJson = new ResponseJson();
+
+        mvc.perform(MockMvcRequestBuilders.get("/issue/").accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(result -> responseJson.setJson(result.getResponse().getContentAsString()));
+
+        Issue[] issues = objectMapper.readValue(responseJson.getJson(), Issue[].class);
+
+        assertThat(issues).isNotEmpty();
+
+        Issue issue = issues[0];
+        long issueId = issue.getId();
+
+        issue.setSummary("NEW SUMMARY");
+        issue.setType(Issue.Type.DEFECT);
+        issue.setPriority(Issue.Priority.HIGH);
+        issue.setDescription("NEW DESCRIPTION");
+
+        String issueJson = objectMapper.writeValueAsString(issue);
+
+        mvc.perform(MockMvcRequestBuilders
+                .put("/issue/" + issueId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(issueJson))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("summary", Matchers.is("NEW SUMMARY")))
+                .andExpect(MockMvcResultMatchers.jsonPath("type", Matchers.is("DEFECT")))
+                .andExpect(MockMvcResultMatchers.jsonPath("priority", Matchers.is("HIGH")))
+                .andExpect(MockMvcResultMatchers.jsonPath("description", Matchers.is("NEW DESCRIPTION")))
+                .andExpect(MockMvcResultMatchers.jsonPath("creator.firstName", Matchers.is("John")))
+                .andExpect(MockMvcResultMatchers.jsonPath("creator.lastName", Matchers.is("Doe")))
+                .andExpect(MockMvcResultMatchers.jsonPath("id", Matchers.is((int)issueId)));
+    }
+
+    // TODO there's got to be a seriously better way than this
+    private static class ResponseJson {
+        private String json = null;
+
+        public String getJson() {
+            return json;
+        }
+
+        public void setJson(String json) {
+            this.json = json;
+        }
     }
 }

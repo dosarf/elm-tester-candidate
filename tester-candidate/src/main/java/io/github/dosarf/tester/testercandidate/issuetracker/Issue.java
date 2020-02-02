@@ -67,18 +67,38 @@ public class Issue {
         return summary;
     }
 
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
     public Type getType() { return type; }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
 
     public Priority getPriority() {
         return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
     }
 
     public String getDescription() {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public User getCreator() {
         return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
     @Override

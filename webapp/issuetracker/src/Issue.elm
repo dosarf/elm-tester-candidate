@@ -2,6 +2,7 @@ module Issue exposing (
     Issue,
     Type(..), types, typeFromString, typeToString,
     Priority(..), priorities, priorityFromString, priorityToString,
+    changeSummary, changeType, changePriority, changeDescription,
     title, issueDecoder, issuesDecoder, issueEncoder)
 
 import User exposing (User, userEncoder, userDecoder)
@@ -107,6 +108,26 @@ type alias Issue =
   , description : String
   , creator : User
   }
+
+
+changeSummary : String -> Issue -> Issue
+changeSummary summary issue =
+    { issue | summary = summary }
+
+
+changeType : Type -> Issue -> Issue
+changeType type_ issue =
+    { issue | type_ = type_ }
+
+
+changePriority : Priority -> Issue -> Issue
+changePriority priority issue =
+    { issue | priority = priority }
+
+
+changeDescription : String -> Issue -> Issue
+changeDescription description issue =
+    { issue | description = description }
 
 
 title : Issue -> String

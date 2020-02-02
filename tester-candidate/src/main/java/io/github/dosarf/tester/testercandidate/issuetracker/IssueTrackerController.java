@@ -42,12 +42,57 @@ public class IssueTrackerController {
         Optional<Issue> issueMaybe = issueService.findById(id);
 
         return issueMaybe
-                .map(issue -> ResponseEntity
-                        .status(HttpStatus.OK)
-                        .body(issue))
+                .map(issue -> ResponseEntity.ok(issue))
                 .orElseGet(() -> ResponseEntity
                         .status(HttpStatus.NOT_FOUND)
                         .build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Issue> update(
+            @PathVariable Long id,
+            @RequestBody Issue issue) {
+        User creatorFromRequest = issue.getCreator();
+        if (Objects.isNull(creatorFromRequest)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(issue);
+        }
+
+        Optional<User> creatorMaybe = userService.findById(creatorFromRequest.getId());
+        if (!creatorMaybe.isPresent()) {
+            return ResponseEntity
+                    .notFound()
+                    .build();
+        }
+
+        User creator = creatorMaybe.get();
+
+        Optional<Issue> issueMaybe = issueService.findById(id);
+
+        if (!issueMaybe.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .build();
+        }
+
+        Issue loadedIssue = issueMaybe.get();
+        loadedIssue.setSummary(issue.getSummary());
+        loadedIssue.setType(issue.getType());
+        loadedIssue.setPriority(issue.getPriority());
+        loadedIssue.setDescription(issue.getDescription());
+        loadedIssue.setCreator(creator);
+
+        Issue persistedIssue = issueService.save(loadedIssue);
+
+        if (Objects.isNull(persistedIssue)) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
+        } else {
+            return ResponseEntity
+                    .ok(persistedIssue);
+        }
     }
 
     @PostMapping("/")

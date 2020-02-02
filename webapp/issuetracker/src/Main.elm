@@ -43,7 +43,8 @@ update msg model =
 
         IssueTrackerMsg issueTrackerMsg ->
             let
-                editingIndex = model.currentTab - 1
+                editingIndex =
+                    model.currentTab - 1
                 ( issueTrackerModel, cmd ) =
                     IssueTracker.update issueTrackerMsg editingIndex model.issueTrackerModel
             in
@@ -65,7 +66,7 @@ view : Model -> Html Msg
 view model =
     let
         tabTexts =
-            IssueTracker.tabTextList model.issueTrackerModel
+            IssueTracker.tabList model.issueTrackerModel
                 |> List.map (Html.Styled.map IssueTrackerMsg)
     in
         main_ []
@@ -90,9 +91,7 @@ view model =
 
 tabContentView : Model -> Html Msg
 tabContentView model =
-    case model.currentTab of
-        _ ->
-            Html.Styled.map IssueTrackerMsg (IssueTracker.view model.currentTab model.issueTrackerModel)
+    Html.Styled.map IssueTrackerMsg (IssueTracker.view model.currentTab model.issueTrackerModel)
 
 
 subscriptions : Model -> Sub Msg
