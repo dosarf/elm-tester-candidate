@@ -4,8 +4,8 @@ import Dict exposing (Dict)
 import List.Extra as ListX
 
 import Css exposing (backgroundColor, border3, cursor, hex, hover, pointer, px, solid)
-import Html.Styled exposing (button, div, Html, span, text)
-import Html.Styled.Attributes exposing (css, class, disabled)
+import Html.Styled exposing (a, button, div, Html, span, text)
+import Html.Styled.Attributes exposing (css, class, disabled, href, target)
 import Html.Styled.Events exposing (onClick)
 import Http
 import FontAwesome
@@ -36,6 +36,16 @@ issueCreateUri =
     "../"
 
 
+exportUri : User -> String
+exportUri user =
+    "../../exportissues/user/" ++ String.fromInt user.id
+
+
+exportTargetUri : User -> String
+exportTargetUri user =
+    "issues-created-by-" ++ String.fromInt user.id
+
+
 editIcon : Html Msg
 editIcon =
     span
@@ -55,6 +65,13 @@ createIcon =
     span
         [ class "ml1" ]
         [ FontAwesome.icon FontAwesome.plusCircle |> Html.Styled.fromUnstyled ]
+
+
+exportIcon : Html Msg
+exportIcon =
+    span
+        [ class "ml1" ]
+        [ FontAwesome.icon FontAwesome.share |> Html.Styled.fromUnstyled ]
 
 
 -- MODEL
@@ -455,26 +472,44 @@ issuesListItems model =
 
 issuesView : Model -> Html Msg
 issuesView model =
-    div
-        [ class "ml2 sm-col-6" ]
-        [ div
-            [ class "p2 h2 bold" ]
-            [ text "Issues" ]
-        , div
-            [ class "mb1 mt1" ]
-            [ button
-                [ class "btn btn-primary"
-                , disabled (model.user |> Maybe.map (\_ -> False) |> Maybe.withDefault True)
-                , onClick CreateNewIssue
+    let
+        exportLinkDiv =
+            model.user
+                |> Maybe.map (\user ->
+                    div
+                        [ class "mb1 mt1" ]
+                        [ a
+                              [ href <| exportUri user
+                              , target <| exportTargetUri user
+                              ]
+                              [ text "Export"
+                              , exportIcon
+                              ]
+                        ]
+                  )
+                |> Maybe.withDefault (div [] [])
+    in
+        div
+            [ class "ml2 sm-col-6" ]
+            [ div
+                [ class "p2 h2 bold" ]
+                [ text "Issues" ]
+            , exportLinkDiv
+            , div
+                [ class "mb1 mt1" ]
+                [ button
+                    [ class "btn btn-primary"
+                    , disabled (model.user |> Maybe.map (\_ -> False) |> Maybe.withDefault True)
+                    , onClick CreateNewIssue
+                    ]
+                    [ text "Create New"
+                    , createIcon
+                    ]
                 ]
-                [ text "Create New"
-                , createIcon
-                ]
+            , div
+                  []
+                  (issuesListItems model)
             ]
-        , div
-              []
-              (issuesListItems model)
-        ]
 
 
 editingIssueView : Int -> Model -> Html Msg

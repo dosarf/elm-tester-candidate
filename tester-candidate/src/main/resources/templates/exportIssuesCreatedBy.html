@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="'Issues by ' + ${creator.firstName} + ', ' + ${creator.lastName} + ' (#' + ${creator.id} + ')'">Issues by John, Doe (#1)</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+    #issues {
+      font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 90%;
+      margin-left:auto;
+      margin-right:auto;
+    }
+
+    #issues td, #customers th {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    #issues th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      font-size: 150%;
+    }
+
+    td.issue-id {
+      text-align: right;
+      background-color: #888888;
+      color: white;
+      width: 4em;
+      font-weight: bold;
+    }
+
+    td.summary {
+      font-weight: bold;
+    }
+    </style>
+</head>
+<body>
+
+<table id="issues">
+    <thead>
+        <tr>
+            <th colspan="10">
+                Issues created by
+                <span th:text="${creator.firstName} + ', ' + ${creator.lastName}">John, Doe</span>
+            </th>
+        </tr>
+    </thead>
+    <tbody th:each="issue : ${issues}">
+        <tr>
+            <td colspan="1" class="issue-id" th:text="'#' + ${issue.id}">#ID</td>
+            <td colspan="9" class="summary" th:text="${issue.summary}">Summary</td>
+        </tr>
+        <tr>
+            <td colspan="10" th:text="${issue.type} + ' / ' + ${issue.priority}">DEFECT / LOW</td>
+        </tr>
+        <tr>
+            <td colspan="10">
+<pre th:text="${issue.description}">Description</pre>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -4,6 +4,7 @@ import io.github.dosarf.tester.testercandidate.issuetracker.Issue;
 import io.github.dosarf.tester.testercandidate.issuetracker.IssueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -56,7 +57,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/")
+    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Iterable<User>> listAll() {
         Iterable<User> users = userService.findAll();
 
@@ -65,8 +66,8 @@ public class UserController {
     }
 
 
-    @GetMapping("/{id}/issue")
-    public ResponseEntity<Iterable<Issue>>  listIssuesCreatedBy(@PathVariable Long id) {
+    @GetMapping(value = "/{id}/issue", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Iterable<Issue>> listIssuesCreatedBy(@PathVariable Long id) {
         Optional<User> userMaybe = userService.findById(id);
 
         return userMaybe
@@ -79,4 +80,5 @@ public class UserController {
                         .status(HttpStatus.NOT_FOUND)
                         .build());
     }
+
 }
