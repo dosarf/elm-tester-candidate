@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.2.4.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'java'
+	id 'application'
 }
 
 group = 'io.github.dosarf.tester'
@@ -27,3 +28,8 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+application {
+	mainClassName = 'io.github.dosarf.tester.testercandidate.TesterCandidateApplication'
+}
+
