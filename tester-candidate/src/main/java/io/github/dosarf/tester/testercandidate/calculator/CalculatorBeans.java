@@ -7,7 +7,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 @Configuration
-public class Beans {
+public class CalculatorBeans {
     @Bean
     public ScriptEngine scriptEngine() {
         ScriptEngineManager mgr = new ScriptEngineManager();

@@ -27,6 +27,7 @@ public class Issue {
     private String summary;
     private Type type;
     private Priority priority;
+    @Column(length = 4096)
     private String description;
 
     @ManyToOne

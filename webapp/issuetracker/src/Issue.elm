@@ -131,13 +131,34 @@ isNewIssue issue =
     issue.id < 0
 
 
+defaultDescription : String
+defaultDescription = """
+## Your description here
+
+Using _awesome_ **Markdown** notation, similar to what
+[GitHub](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax) supports.
+
+- With one, or
+- more bullets.
+
+You can even `include` code snippets here, thusly:
+```
+int ever = 1;
+
+for (;ever;) {
+  twirl(thumb);
+}
+```
+"""
+
+
 newIssue : Int -> User -> Issue
 newIssue id user =
     { id = id
     , summary = "Your summary here"
     , type_ = ENHANCEMENT
     , priority = LOW
-    , description = "Your description here"
+    , description = defaultDescription
     , creator = user
     }
 

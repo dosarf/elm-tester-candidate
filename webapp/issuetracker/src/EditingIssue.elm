@@ -4,17 +4,42 @@ module EditingIssue exposing (
     newIssue, startEditingIssue, updateIssue, shouldSaveIssue, shouldCreateIssue,
     update, view)
 
-import Html.Styled exposing (button, div, Html, input, label, option, select, text, textarea)
+import Html.Styled exposing (button, div, Html, input, label, option, select, span, text, textarea)
 import Html.Styled.Attributes exposing (class, disabled, rows, selected, value)
 import Html.Styled.Events exposing (onClick, onInput)
+import Html.Attributes
+import FontAwesome
+import Markdown
 import User exposing (User)
 import Issue exposing (Issue)
+
+-- CONSTANTS
+
+editIcon : Html Msg
+editIcon =
+    span
+        [ class "ml1" ]
+        [ FontAwesome.icon FontAwesome.edit |> Html.Styled.fromUnstyled ]
+
+
+viewIcon : Html Msg
+viewIcon =
+    span
+        [ class "ml1" ]
+        [ FontAwesome.icon FontAwesome.eye |> Html.Styled.fromUnstyled ]
+
+-- MODEL
+
+type MarkdownMode
+    = ViewMarkdown
+    | EditMarkdown
 
 
 type alias Model =
     { isEdited : Bool
     , isNew : Bool
     , issue : Issue
+    , markdownMode : MarkdownMode
     }
 
 type Msg
@@ -24,6 +49,7 @@ type Msg
     | DescriptionChanged String
     | SaveIssue
     | CreateIssue
+    | ToggleMarkdownMode
 
 
 maxLimitedSummaryLength : Int
@@ -65,11 +91,12 @@ newIssue id user =
     { isEdited = False
     , isNew = True
     , issue = Issue.newIssue id user
+    , markdownMode = ViewMarkdown
     }
 
 startEditingIssue : Issue -> Model
 startEditingIssue issue =
-    Model False False issue
+    Model False False issue ViewMarkdown
 
 
 updateIssue : Issue -> Model -> Model
@@ -78,6 +105,7 @@ updateIssue issue model =
     | issue = issue
     , isEdited = False
     , isNew = Issue.isNewIssue issue
+    , markdownMode = ViewMarkdown
     }
 
 
@@ -127,6 +155,38 @@ update msg model =
         CreateIssue ->
             model
 
+        ToggleMarkdownMode ->
+            { model | markdownMode = if model.markdownMode == ViewMarkdown then EditMarkdown else ViewMarkdown
+            }
+
+
+markdownOptions : Markdown.Options
+markdownOptions =
+    { githubFlavored = Just { tables = False, breaks = False }
+    , defaultHighlighting = Nothing
+    , sanitize = True
+    , smartypants = False
+    }
+
+
+descriptionView : Model -> Html Msg
+descriptionView model =
+    case model.markdownMode of
+        ViewMarkdown ->
+            Markdown.toHtmlWith
+                markdownOptions
+                [ Html.Attributes.class "border" ]
+                model.issue.description
+                |> Html.Styled.fromUnstyled
+
+        EditMarkdown ->
+            textarea
+                [ class "block col-12 mb1 field"
+                , rows 20
+                , value model.issue.description
+                , onInput DescriptionChanged
+                ]
+                []
 
 -- https://basscss.com/v7/docs/base-forms/
 view : Model -> Html Msg
@@ -139,7 +199,7 @@ view model =
                 [ text <| idString model ]
             ]
         , label
-              []
+              [ class "bold" ]
               [ text "Summary" ]
         , input
               [ class "block col-12 mb1 field"
@@ -148,7 +208,7 @@ view model =
               ]
               []
         , label
-              []
+              [ class "bold" ]
               [ text "Type" ]
         , fieldSelect
               Issue.types
@@ -156,23 +216,30 @@ view model =
               Issue.typeToString
               (Issue.typeFromString >> TypeChanged)
         , label
-              []
+              [ class "bold" ]
               [ text "Priority" ]
         , fieldSelect
               Issue.priorities
               model.issue.priority
               Issue.priorityToString
               (Issue.priorityFromString >> PriorityChanged)
-        , label
+        , div
             []
-            [ text "Description" ]
-        , textarea
-            [ class "block col-12 mb1 field"
-            , rows 20
-            , value model.issue.description
-            , onInput DescriptionChanged
+            [ label
+                [ class "bold" ]
+                [ text "Description" ]
+            , button
+                [ class "btn btn-primary ml4 black bg-aqua"
+                , onClick ToggleMarkdownMode
+                ]
+                ( if model.markdownMode == ViewMarkdown
+                    then
+                        [ text "Edit", editIcon ]
+                    else
+                        [ text "View", viewIcon ]
+                )
             ]
-            []
+        , descriptionView model
         , button
             [ if not model.isEdited then (class "btn btn-primary black bg-silver") else (class "btn btn-primary")
             , disabled (not model.isEdited)
