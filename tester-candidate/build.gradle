@@ -8,6 +8,7 @@ plugins {
 group = 'io.github.dosarf.tester'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 repositories {
 	mavenCentral()
@@ -20,7 +21,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'com.atlassian.commonmark:commonmark:0.14.0'
 	runtimeOnly 'com.h2database:h2'
-	
+
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
@@ -33,4 +34,3 @@ test {
 application {
 	mainClassName = 'io.github.dosarf.tester.testercandidate.TesterCandidateApplication'
 }
-

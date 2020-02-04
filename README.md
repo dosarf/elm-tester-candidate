@@ -1,0 +1,83 @@
+
+# elm-tester-candidate
+
+A tool for technical interviewing Q&A engineers.
+- A little service with couple of webservice endpoint
+  - a broken (deliberately buggy) calculator, e.g.
+	```
+	$ curl -v -X POST -H "Content-Type: application/json" -d "{\"operator\":\"ADD\",\"operands\":[\"1\",\"2\"]}" http://localhost:8080/calculator
+	```
+	- a user service endpoint
+	```
+	$ curl http://localhost:8080/user/
+	```
+	- an issue tracker endpoint
+	```
+	$ curl http://localhost:8080/issue/
+	```
+	- also serving an Issue Tracker SPA webapp (written in Elm)
+	  - point your browser to `http://localhost:8080/issue/spa/index.html`
+		- create, edit issues
+		- generate an (HTML) report of all the issues of a user
+
+## Service
+
+Under `tester-candidate/` written in Java (8), Spring Boot.
+
+### Install
+Probably only Java (8) is required, as Gradle Wrapper is used.
+
+### Develop
+
+- Run unit tests with
+  - `./gradlew test`
+- Just start the stuff for testing
+  - `./gradlew bootRun`
+- Build the distribution
+  - `./gradlew bootDistZip` (or `bootDistTar`)
+
+### Usage
+
+Database is created under `~/tester-candidate-h2-db.mv.db` on first run.
+
+While there is already service endpoint for users, there is no webapp
+managing them, nor there is any way to prevent one user (Q&A candidate)
+checking the stuff written by others.
+- Work in progress.
+
+Currently the IssueTracker
+- assumes that there is at least one user created already,
+- it does download them, on the startup and takes the first one into use.
+
+So, for now, the best is to create a DB for every candidate, and init, using
+CURL:
+```
+(tester-candidate service is running)
+$ curl -X POST -H "Content-Type: application/json" -d "{\"firstName\":\"QA\",\"lastName\":\"Candidate\"}" http://localhost:8080/user/
+```
+
+
+## IssueTracker webapp
+
+Under `webapp/issuetracker`, written in Elm 0.19.
+
+### Install
+
+- node and npm
+- Elm 0.19
+- elm-test (with npm)
+- `npm install`
+- (maybe) `elm make src/Main.elm --output temp.html`
+	- to get Elm packages pulled in, CHECK: is this necessary?
+
+### Develop
+
+- Run unit tests
+  - `elm-test`
+- Building the Elm app
+  - `npm run build`
+- built app distribution is under `dist/`
+- copying the built Elm distribution to the Spring Boot distribution
+  - `npm run deploy`
+  - after which you can create a distro of the `tester-candidate`, see above.
+	
