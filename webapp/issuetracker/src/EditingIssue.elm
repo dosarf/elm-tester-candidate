@@ -194,9 +194,15 @@ view model =
     div [ class "ml2 sm-col-6" ]
         [ div
             []
-            [ div
+            [ label
                 [ class "p2 h2 bold" ]
                 [ text <| idString model ]
+            , button
+                [ if not model.isEdited then (class "btn btn-primary ml4 black bg-silver") else (class "btn btn-primary ml4")
+                , disabled (not model.isEdited)
+                , onClick <| if model.isNew then CreateIssue else SaveIssue
+                ]
+                [ text <| if model.isNew then "Create" else "Save" ]
             ]
         , label
               [ class "bold" ]
@@ -240,12 +246,6 @@ view model =
                 )
             ]
         , descriptionView model
-        , button
-            [ if not model.isEdited then (class "btn btn-primary black bg-silver") else (class "btn btn-primary")
-            , disabled (not model.isEdited)
-            , onClick <| if model.isNew then CreateIssue else SaveIssue
-            ]
-            [ text <| if model.isNew then "Create" else "Save" ]
         ]
 
 
