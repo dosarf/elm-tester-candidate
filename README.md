@@ -7,18 +7,15 @@ A tool for technical interviewing Q&A engineers.
 	```
 	$ curl -v -X POST -H "Content-Type: application/json" -d "{\"operator\":\"ADD\",\"operands\":[\"1\",\"2\"]}" http://localhost:8080/calculator
 	```
-	- a user service endpoint
-	```
-	$ curl http://localhost:8080/user/
-	```
-	- an issue tracker endpoint
-	```
-	$ curl http://localhost:8080/issue/
-	```
+
+	- a user service endpoint: `http://localhost:8080/user/`
+	- an issue tracker endpoint: `http://localhost:8080/issue/`
 	- also serving an Issue Tracker SPA webapp (written in Elm)
 	  - point your browser to `http://localhost:8080/issue/spa/index.html`
 		- create, edit issues
 		- generate an (HTML) report of all the issues of a user
+	- issues of a given user are at `http://localhost:8080/exportissues/user/<ID>`
+  - finally, an issue report generator (HTML): `http://localhost:8080/exportissues/user/<ID>`
 
 ## Service
 
@@ -80,4 +77,11 @@ Under `webapp/issuetracker`, written in Elm 0.19.
 - copying the built Elm distribution to the Spring Boot distribution
   - `npm run deploy`
   - after which you can create a distro of the `tester-candidate`, see above.
-	
+
+## Further (planned) work
+- Create a broken (deliberately) Calculator webapp, using the broken Calculator service endpoint
+  - for verifying manual testing capabilities of Q&A candidate
+- Provide a sample BDD test setup (Robot?), testing the Calculator webservice
+  - for verifying test scripting capabilities of Q&A candidate
+- rename incorrect endpoint URI paths (issue/ -> issues/, etc)
+- proper user management

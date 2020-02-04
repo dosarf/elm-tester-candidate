@@ -1,4 +1,4 @@
-module IssueTracker exposing (Model, Msg, editingIssueCount, init, tabList, update, view)
+module IssueTracker exposing (Model, isOffline, Msg, editingIssueCount, init, tabList, update, view)
 
 import Dict exposing (Dict)
 import List.Extra as ListX
@@ -81,7 +81,13 @@ type alias Model =
     , issues : Dict Int Issue
     , editingIssues : List EditingIssue.Model
     , newIssueId : Int
+    , offline : Bool
     }
+
+
+isOffline : Model -> Bool
+isOffline model =
+    model.offline
 
 
 editingIssueCount : Model -> Int
@@ -195,6 +201,7 @@ init () =
       , issues = Dict.empty
       , editingIssues = []
       , newIssueId = Issue.firstNewIssueId
+      , offline = False
       }
     , downloadUsersCmd
     )
@@ -222,6 +229,7 @@ offlineModel =
                 |> issueListToDict
         , editingIssues = []
         , newIssueId = Issue.firstNewIssueId
+        , offline = True
         }
 
 
@@ -250,7 +258,7 @@ update msg editingIndex model =
                         _ =
                             Debug.log "ISSUES HTTP ERROR" <| httpErrorToString httpError
                     in
-                        ( model
+                        ( offlineModel
                         , Cmd.none
                         )
 
@@ -474,8 +482,8 @@ issuesView : Model -> Html Msg
 issuesView model =
     let
         exportLinkDiv =
-            model.user
-                |> Maybe.map (\user ->
+            case (model.user, model.offline) of
+                (Just user, False) ->
                     div
                         [ class "mb1 mt1" ]
                         [ a
@@ -486,8 +494,8 @@ issuesView model =
                               , exportIcon
                               ]
                         ]
-                  )
-                |> Maybe.withDefault (div [] [])
+                _ ->
+                    div [] []
     in
         div
             [ class "ml2 sm-col-6" ]

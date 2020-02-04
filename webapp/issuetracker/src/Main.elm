@@ -62,11 +62,19 @@ update msg model =
 
 {-| A logo image, with inline styles that change on hover.
 -}
-logo : Html msg
-logo =
-    h1
-        [ class "px3 py1" ]
-        [ text "IssueTracker" ]
+logo : Model -> Html msg
+logo model =
+    let
+        appTitle =
+            if IssueTracker.isOffline model.issueTrackerModel
+                then
+                    "IssueTracker (Offline)"
+                else
+                    "IssueTracker"
+    in
+        h1
+            [ class "px3 py1" ]
+            [ text appTitle ]
 
 
 view : Model -> Html Msg
@@ -82,7 +90,7 @@ view model =
                 []
                 [ div
                     []
-                    [ logo ]
+                    [ logo model ]
                 ]
             , div
                 [ css [ width (vw 100) ] ]
