@@ -32,7 +32,7 @@ typeDecoder =
                 "ENHANCEMENT" ->
                     Decode.succeed ENHANCEMENT
                 whatEver ->
-                    Decode.fail <| "Unknown priority: " ++ whatEver
+                    Decode.fail <| "Unknown type: " ++ whatEver
         )
 
 
@@ -45,12 +45,6 @@ typeToString type_ =
             "ENHANCEMENT"
 
 
-type Priority
-    = HIGH
-    | MEDIUM
-    | LOW
-
-
 typeFromString : String -> Type
 typeFromString string =
     case string of
@@ -58,6 +52,12 @@ typeFromString string =
             DEFECT
         _ ->
             ENHANCEMENT
+
+
+type Priority
+    = HIGH
+    | MEDIUM
+    | LOW
 
 
 priorities : List Priority

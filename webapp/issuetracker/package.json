@@ -1,7 +1,7 @@
 {
-  "name": "findfirstunique-elm",
+  "name": "issuetracker",
   "version": "1.0.0",
-  "description": "Elm app, finding first unique in collection",
+  "description": "Elm app, front-end for tracking issues",
   "main": "index.js",
   "directories": {
     "test": "tests"
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dosarf/findfirstunique-elm.git"
+    "url": "git+https://github.com/dosarf/elm-tester-candidate.git"
   },
   "keywords": [
     "Elm"
@@ -37,7 +37,7 @@
   "author": "dosarf",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dosarf/findfirstunique-elm/issues"
+    "url": "https://github.com/dosarf/elm-tester-candidate/issues"
   },
-  "homepage": "https://github.com/dosarf/findfirstunique-elm#readme"
+  "homepage": "https://github.com/dosarf/elm-tester-candidate#readme"
 }
