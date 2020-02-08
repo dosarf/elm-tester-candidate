@@ -4,19 +4,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
-@RestController
+@Controller
+@RequestMapping("/calculator")
 public class CalculatorController {
 
     @Autowired
     private Calculator calculator;
 
+    @GetMapping("/spa")
+    public RedirectView redirect(RedirectAttributes attributes) {
+        return new RedirectView("spa/index.html");
+    }
+
+    @GetMapping("/spa/")
+    public RedirectView redirect2(RedirectAttributes attributes) {
+        return new RedirectView("index.html");
+    }
+
+
     @RequestMapping(
-            value = "/calculator",
+            value = "/",
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)

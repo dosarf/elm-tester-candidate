@@ -32,7 +32,7 @@ class CalculatorControllerTests {
 		CalculationResponse response = CalculationResponse.success(request, 5);
 		String responseStr = objectMapper.writeValueAsString(response);
 
-		mvc.perform(MockMvcRequestBuilders.post("/calculator").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content(requestStr))
+		mvc.perform(MockMvcRequestBuilders.post("/calculator/").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content(requestStr))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().json(responseStr));
 	}
