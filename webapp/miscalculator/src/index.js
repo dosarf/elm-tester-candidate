@@ -1,9 +1,10 @@
 'use strict';
 
-require('ace-css/css/ace.min.css');
+import './assets/miscalculator.scss';
 
-require('./assets/miscalculator.css')
+require('ace-css/css/ace.min.css');
 require('./index.html');
+
 var elm = require('./Main.elm');
 
 var app = elm.Elm.Main.init({

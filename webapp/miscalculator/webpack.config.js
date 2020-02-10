@@ -26,6 +26,10 @@ module.exports = {
         }
       },
       {
+        test: /\.scss$/,
+        loader: 'style-loader!css-loader!sass-loader',
+      },
+      {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader'],
       },
@@ -37,6 +41,18 @@ module.exports = {
               name: '[path][name].[ext]',
               context: 'src',
               debug: true
+            }
+          }
+        ]
+      },
+      {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'fonts/'
             }
           }
         ]

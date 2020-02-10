@@ -3,17 +3,17 @@
 
 A tool for technical interviewing Q&A engineers.
 - A broken (deliberately buggy) calculator webapp
-  - a webservice to test
+  - A broken frontend at `http://localhost:8080/calculator/spa`
+  - backed by a broken webservice
 	```
 	$ curl -v -X POST -H "Content-Type: application/json" -d "{\"operator\":\"ADD\",\"operands\":[\"1\",\"2\"]}" http://localhost:8080/calculator/
 	```
-  - with a broken frontend at `http://localhost:8080/calculator/spa`
 - An issue tracker webapp
+  - frontend is at `http://localhost:8080/issue/spa`
   - a user service endpoint: `http://localhost:8080/user/`
   - an issue tracker endpoint: `http://localhost:8080/issue/`
   - issues of a given user are at `http://localhost:8080/exportissues/user/<ID>`
   - finally, an issue report generator (HTML): `http://localhost:8080/exportissues/user/<ID>`
-  - frontend is at `http://localhost:8080/issue/spa`
 
 ## Service
 

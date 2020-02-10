@@ -1,0 +1,26 @@
+@font-face{
+	font-family: 'Calculator';
+	src: url('fonts/Calculator.woff') format('woff'),
+	     url('fonts/Calculator.ttf') format('truetype');
+}
+
+table.calculator {
+}
+
+button.calculator {
+  font-size: 2em;
+  font-weight: bold;
+  width: 2.0em;
+}
+
+#calculate {
+  height: 3em;
+}
+
+input.displayBox {
+  text-align:right;
+  font-family: "Calculator", Courier, monospace;
+  font-size: 2em;
+  font-weight: bold;
+  background-image: linear-gradient(to bottom, rgb(67, 130, 86), rgb(179, 213, 189));
+}

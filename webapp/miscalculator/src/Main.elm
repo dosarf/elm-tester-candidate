@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html, button, div, input, table, text, tr, td)
-import Html.Attributes exposing (class, colspan, readonly, rowspan, value)
+import Html.Attributes exposing (class, colspan, id, readonly, rowspan, style, value)
 import Html.Events exposing (onClick)
 import Http
 
@@ -95,15 +95,24 @@ unicodeOfZero =
     Char.toCode '0'
 
 
+unicodeOfDot : Int
+unicodeOfDot =
+    Char.toCode '.'
+
 -- e.g. "245" -> [5, 4, 2]
 digitsFromString : String -> List Int
 digitsFromString string =
     string
         |> String.toList
         |> List.reverse
-        |> List.filter Char.isDigit -- deliberate bug: discard decimal dot
         |> List.map Char.toCode
-        |> List.map (\unicode -> unicode - unicodeOfZero)
+        |> List.map (\unicode ->
+            if unicode == unicodeOfDot
+                then
+                    decimalDot
+                else
+                    unicode - unicodeOfZero
+        )
 
 
 httpErrorToString : Http.Error -> String
@@ -234,11 +243,30 @@ view model =
                     "Err"
                 else
                     digitsToString model.digits
+
+        calcButton : Msg -> String -> Html Msg
+        calcButton msg txt =
+            button
+                [ class "calculator"
+                , onClick msg
+                ]
+                [ text txt ]
+
+        calcButton2 : Msg -> String -> Html Msg
+        calcButton2 msg txt =
+            button
+                [ id "calculate"
+                , class "calculator"
+                , onClick msg
+                ]
+                [ text txt ]
     in
         div
-            []
+            [ class "block mx-auto mt2"
+            , style "width" "50%"
+            ]
             [ table
-                []
+                [ class "calculator" ]
                 [ tr
                     []
                     [ td
@@ -253,37 +281,37 @@ view model =
                     ]
                 , tr
                     []
-                    [ td [] [ button [ onClick <| OperatorPressed CReq.SQUARE_ROOT ] [ text squareRootSign ] ]
-                    , td [] [ button [ onClick <| OperatorPressed CReq.POWER ] [ text powerSign ] ]
-                    , td [] [ button [ onClick <| DecimalDotPressed ] [ text dotSign ] ]
-                    , td [] [ button [ onClick <| ClearPressed ] [ text "C" ] ]
+                    [ td [] [ calcButton (OperatorPressed CReq.SQUARE_ROOT) squareRootSign ]
+                    , td [] [ calcButton (OperatorPressed CReq.POWER) powerSign ]
+                    , td [] [ calcButton (DecimalDotPressed) dotSign ]
+                    , td [] [ calcButton ClearPressed "C" ]
                     ]
                 , tr
                     []
-                    [ td [] [ button [ onClick <| DigitPressed 7 ] [ text "7" ] ]
-                    , td [] [ button [ onClick <| DigitPressed 8 ] [ text "8" ] ]
-                    , td [] [ button [ onClick <| DigitPressed 9 ] [ text "9" ] ]
-                    , td [] [ button [ onClick <| OperatorPressed CReq.MULTIPLY ] [ text multiplicationSign ] ]
+                    [ td [] [ calcButton (DigitPressed 7) "7" ]
+                    , td [] [ calcButton (DigitPressed 8) "8" ]
+                    , td [] [ calcButton (DigitPressed 9) "9" ]
+                    , td [] [ calcButton (OperatorPressed CReq.MULTIPLY) multiplicationSign ]
                     ]
                 , tr
                     []
-                    [ td [] [ button [ onClick <| DigitPressed 4 ] [ text "4" ] ]
-                    , td [] [ button [ onClick <| DigitPressed 5 ] [ text "5" ] ]
-                    , td [] [ button [ onClick <| DigitPressed 6 ] [ text "6" ] ]
-                    , td [] [ button [ onClick <| OperatorPressed CReq.DIVIDE ] [ text divisionSign ] ]
+                    [ td [] [ calcButton (DigitPressed 4) "4" ]
+                    , td [] [ calcButton (DigitPressed 5) "5" ]
+                    , td [] [ calcButton (DigitPressed 6) "6" ]
+                    , td [] [ calcButton (OperatorPressed CReq.DIVIDE) divisionSign ]
                     ]
                 , tr
                     []
-                    [ td [] [ button [ onClick <| DigitPressed 1 ] [ text "1" ] ]
-                    , td [] [ button [ onClick <| DigitPressed 2 ] [ text "2" ] ]
-                    , td [] [ button [ onClick <| DigitPressed 3 ] [ text "3" ] ]
-                    , td [ rowspan 2 ] [ button [ onClick <| CalculatePressed ] [ text "=" ] ]
+                    [ td [] [ calcButton (DigitPressed 1) "1" ]
+                    , td [] [ calcButton (DigitPressed 2) "2" ]
+                    , td [] [ calcButton (DigitPressed 3) "3" ]
+                    , td [ rowspan 2 ] [ calcButton2 CalculatePressed "=" ]
                     ]
                 , tr
                     []
-                    [ td [] [ button [ onClick <| DigitPressed 0 ] [ text "0" ] ]
-                    , td [] [ button [ onClick <| OperatorPressed CReq.ADD ] [ text "+" ] ]
-                    , td [] [ button [ onClick <| OperatorPressed CReq.SUBTRACT ] [ text "-" ] ]
+                    [ td [] [ calcButton (DigitPressed 0) "0" ]
+                    , td [] [ calcButton (OperatorPressed CReq.ADD) "+" ]
+                    , td [] [ calcButton (OperatorPressed CReq.SUBTRACT) "-" ]
                     ]
                 ]
             ]
